@@ -338,3 +338,11 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+
+Build/
+Cirnix.JassNative.Test/
+JNLoader/
+JNUpdater/
+JassNative WE/
+M16Locator/
+JassNative AIO.sln
