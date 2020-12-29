@@ -110,4 +110,7 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>DEL /F $(ProjectDir)$(OutDir)Easy*</PostBuildEvent>
+  </PropertyGroup>
 </Project>
