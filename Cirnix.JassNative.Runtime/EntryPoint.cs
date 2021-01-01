@@ -60,7 +60,10 @@ namespace Cirnix.JassNative.Runtime
                         Thread.Sleep(1); // Sleep(0) is a nono.
                 }
                 // Everything traced will be written to "debug.log".
-                Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(hackPath, $"logs\\runtime\\{DateTime.Now:yyyy-MM-dd HH.mm.ss}.log")));
+                string logPath = Path.Combine(hackPath, "logs\\runtime");
+                if (!Directory.Exists(logPath))
+                    Directory.CreateDirectory(logPath);
+                Trace.Listeners.Add(new TextWriterTraceListener(Path.Combine(logPath, $"{DateTime.Now:yyyy-MM-dd HH.mm.ss}.log")));
                 Trace.IndentSize = 2;
 
                 // We autoflush our trace, so we get everything immediately. This 
