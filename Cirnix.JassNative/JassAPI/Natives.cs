@@ -1203,10 +1203,10 @@ namespace Cirnix.JassNative.JassAPI
 
         private static int InitNativesHook()
         {
-            Trace.WriteLine("Natives initialized");
             int num = InitNatives();
             foreach (NativeDeclaration customNative in customNatives)
                 GameFunctions.BindNative(customNative.Function, customNative.Name, customNative.Prototype);
+            Trace.WriteLine("Natives initialized");
             return num;
         }
 
@@ -1225,23 +1225,10 @@ namespace Cirnix.JassNative.JassAPI
 
         public static NativeDeclaration Add(Delegate function, string name)
         {
-            string str1 = "(";
+            string prototype = "(";
             foreach (ParameterInfo parameter in function.Method.GetParameters())
-            {
-                JassTypeAttribute jassTypeAttribute = (JassTypeAttribute)((IEnumerable<object>)parameter.ParameterType.GetCustomAttributes(typeof(JassTypeAttribute), true)).Single();
-                str1 += jassTypeAttribute.TypeString;
-            }
-            string str2 = str1 + ")";
-            string prototype;
-            if (function.Method.ReturnType == typeof(void))
-            {
-                prototype = str2 + "V";
-            }
-            else
-            {
-                JassTypeAttribute jassTypeAttribute = (JassTypeAttribute)((IEnumerable<object>)function.Method.ReturnType.GetCustomAttributes(typeof(JassTypeAttribute), true)).Single();
-                prototype = str2 + jassTypeAttribute.TypeString;
-            }
+                prototype += ((JassTypeAttribute)((IEnumerable<object>)parameter.ParameterType.GetCustomAttributes(typeof(JassTypeAttribute), true)).Single()).TypeString;
+            prototype += ")" + (function.Method.ReturnType == typeof(void) ? "V" : ((JassTypeAttribute)((IEnumerable<object>)function.Method.ReturnType.GetCustomAttributes(typeof(JassTypeAttribute), true)).Single()).TypeString);
             return Add(function, name, prototype);
         }
 

@@ -116,13 +116,8 @@ namespace Cirnix.JassNative.Runtime
                     catch (TargetInvocationException e)
                     {
                         if (e.InnerException is FileNotFoundException)
-                        {
                             Trace.WriteLine(e.InnerException.Message);
-                        }
-                        else
-                        {
-                            throw e;
-                        }
+                        else throw e;
                     }
                 }
                 sw.Stop();

@@ -1,8 +1,8 @@
-﻿using Cirnix.JassNative.Runtime.Plugin;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+
+using Cirnix.JassNative.Runtime.Plugin;
 
 namespace Cirnix.JassNative.Runtime
 {
@@ -16,10 +16,8 @@ namespace Cirnix.JassNative.Runtime
         public static IEnumerable<string> GetRequires(this Type type)
         {
             foreach (var attribute in type.GetCustomAttributesData())
-            {
                 if (attribute.ToString().Contains(typeof(RequiresAttribute).FullName))
                     yield return attribute.ConstructorArguments[0].Value.ToString();
-            }
         }
     }
 }

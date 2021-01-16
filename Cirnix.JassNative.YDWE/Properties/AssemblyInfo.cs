@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // 이러한 특성 값을 변경하세요.
 [assembly: AssemblyTitle("Cirnix.JassNative.YDWE - YDWE 래핑 라이브러리")]
 [assembly: AssemblyProduct("Cirnix - Warcraft III 보조 도구")]
-[assembly: AssemblyCopyright("Copyright © BlacklightsC 2017 - 2020")]
+[assembly: AssemblyCopyright("Copyright © BlacklightsC 2017 - 2021")]
 
 // ComVisible을 false로 설정하면 이 어셈블리의 형식이 COM 구성 요소에 
 // 표시되지 않습니다. COM에서 이 어셈블리의 형식에 액세스하려면
@@ -26,4 +26,4 @@ using System.Runtime.InteropServices;
 // 모든 값을 지정하거나 아래와 같이 '*'를 사용하여 빌드 번호 및 수정 번호를
 // 기본값으로 할 수 있습니다.
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.*")]
