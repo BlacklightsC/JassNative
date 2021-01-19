@@ -90,15 +90,36 @@ namespace Cirnix.JassNative.Runtime
                     // locate the actual file
                     path = Directory.GetFiles(hackPath, file, SearchOption.AllDirectories).FirstOrDefault();
                     if (!string.IsNullOrEmpty(path))
-                        return Assembly.LoadFrom(path);
+                        try
+                        {
+                            return Assembly.LoadFrom(path);
+                        }
+                        catch
+                        {
+                            return Assembly.Load(File.ReadAllBytes(path));
+                        }
 
                     path = Directory.GetFiles(pluginsFolder, file, SearchOption.AllDirectories).FirstOrDefault();
                     if (!string.IsNullOrEmpty(path))
-                        return Assembly.LoadFrom(path);
+                        try
+                        {
+                            return Assembly.LoadFrom(path);
+                        }
+                        catch
+                        {
+                            return Assembly.Load(File.ReadAllBytes(path));
+                        }
 
                     path = Directory.GetFiles(libraryFolder, file, SearchOption.AllDirectories).FirstOrDefault();
                     if (!string.IsNullOrEmpty(path))
-                        return Assembly.LoadFrom(path);
+                        try
+                        {
+                            return Assembly.LoadFrom(path);
+                        }
+                        catch
+                        {
+                            return Assembly.Load(File.ReadAllBytes(path));
+                        }
 
                     return null;
                 };
@@ -127,15 +148,36 @@ namespace Cirnix.JassNative.Runtime
                     // locate the actual file
                     path = Directory.GetFiles(hackPath, file, SearchOption.AllDirectories).FirstOrDefault();
                     if (!string.IsNullOrEmpty(path))
-                        return Assembly.ReflectionOnlyLoadFrom(path);
+                        try
+                        {
+                            return Assembly.ReflectionOnlyLoadFrom(path);
+                        }
+                        catch
+                        {
+                            return Assembly.ReflectionOnlyLoad(File.ReadAllBytes(path));
+                        }
 
                     path = Directory.GetFiles(pluginsFolder, file, SearchOption.AllDirectories).FirstOrDefault();
                     if (!string.IsNullOrEmpty(path))
-                        return Assembly.ReflectionOnlyLoadFrom(path);
+                        try
+                        {
+                            return Assembly.ReflectionOnlyLoadFrom(path);
+                        }
+                        catch
+                        {
+                            return Assembly.ReflectionOnlyLoad(File.ReadAllBytes(path));
+                        }
 
                     path = Directory.GetFiles(libraryFolder, file, SearchOption.AllDirectories).FirstOrDefault();
                     if (!string.IsNullOrEmpty(path))
-                        return Assembly.ReflectionOnlyLoadFrom(path);
+                        try
+                        {
+                            return Assembly.ReflectionOnlyLoadFrom(path);
+                        }
+                        catch
+                        {
+                            return Assembly.ReflectionOnlyLoad(File.ReadAllBytes(path));
+                        }
 
                     return null;
                 };
