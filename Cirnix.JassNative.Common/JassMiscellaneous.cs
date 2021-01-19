@@ -28,6 +28,17 @@ namespace Cirnix.JassNative.Common
 
         private delegate JassStringRet GetLocalDateTimePrototype();
         private JassStringRet GetLocalDateTime() => DateTime.Now.ToString();
+        private JassInteger GetLocalUnixTime()
+        {
+            try
+            {
+                return DateTimeOffset.Now.ToUnixTimeSeconds();
+            }
+            catch
+            {
+                return 0;
+            }
+        }
 
         private delegate JassInteger BitPrototype(JassInteger x, JassInteger y);
         private JassInteger BitOr(JassInteger x, JassInteger y) => x | y;
@@ -72,6 +83,7 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new WriteLogPrototype(WriteLog));
             Natives.Add(new MiscRVPrototype(WriteLogReal));
             Natives.Add(new GetLocalDateTimePrototype(GetLocalDateTime));
+            Natives.Add(new MiscVIPrototype(GetLocalUnixTime));
             Natives.Add(new BitPrototype(BitOr), false);
             Natives.Add(new BitPrototype(BitAnd), false);
             Natives.Add(new BitPrototype(BitXor), false);
