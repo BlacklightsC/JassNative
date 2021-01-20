@@ -27,9 +27,7 @@ namespace Cirnix.JassNative.Runtime
 
         private string libraryFolder;
 
-        public bool IsInGame;
-
-        public bool IsInMap;
+        public bool IsInMap { get; private set; }
 
         public EntryPoint(RemoteHooking.IContext hookingContext, bool isDebugging, string hackPath, string installPath)
         {
@@ -130,7 +128,6 @@ namespace Cirnix.JassNative.Runtime
                     // extract the file name
                     var file = string.Empty;
                     if (args.Name.IndexOf(',') >= 0)
-                    {
                         try
                         {
                             return Assembly.ReflectionOnlyLoad(args.Name);
@@ -139,7 +136,6 @@ namespace Cirnix.JassNative.Runtime
                         {
                             file = args.Name.Substring(0, args.Name.IndexOf(',')) + ".dll";
                         }
-                    }
                     else if (args.Name.IndexOf(".dll") >= 0)
                         file = Path.GetFileName(args.Name);
                     else
@@ -255,68 +251,21 @@ namespace Cirnix.JassNative.Runtime
             return module;
         }
 
-        private void OnEngineStart()
-        {
-            PluginSystem.OnEngineStart();
-        }
-
-        private void OnEngineEnd()
-        {
-            PluginSystem.OnEngineEnd();
-        }
-
-        private void OnMapStart()
-        {
-            PluginSystem.OnMapStart();
-        }
-
-        private void OnMapEnd()
-        {
-            PluginSystem.OnMapEnd();
-        }
-
         private IntPtr Unknown__SetStateHook(IntPtr @this, bool endMap, bool endEngine)
         {
             try
             {
-                if (endEngine)
+                if (endMap || IsInMap)
                 {
-                    if (IsInMap)
-                    {
-                        IsInMap = false;
-                        OnMapEnd();
-                    }
-                    if (IsInGame)
-                    {
-                        IsInGame = false;
-                        OnEngineEnd();
-                    }
+                    IsInMap = false;
+                    PluginSystem.OnMapEnd();
+                    if (endEngine)
+                        PluginSystem.OnProgramExit();
                 }
                 else
                 {
-                    if (endMap)
-                    {
-                        if (IsInMap)
-                        {
-                            IsInMap = false;
-                            OnMapEnd();
-                        }
-                    }
-                    else
-                    {
-                        if (!IsInGame)
-                        {
-                            OnEngineStart();
-                            IsInGame = true;
-                        }
-
-                        if (IsInMap)
-                        {
-                            OnMapEnd();
-                        }
-                        OnMapStart();
-                        IsInMap = true;
-                    }
+                    IsInMap = true;
+                    PluginSystem.OnMapLoad();
                 }
             }
             catch (Exception e)

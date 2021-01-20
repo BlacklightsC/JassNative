@@ -68,12 +68,10 @@ namespace Cirnix.JassNative.Common
 
         public void OnGameLoad() { }
 
-        public void OnMapStart() { }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
+        public void OnMapLoad() { }
 
         public void OnMapEnd() { }
+
+        public void OnProgramExit() { }
     }
 }

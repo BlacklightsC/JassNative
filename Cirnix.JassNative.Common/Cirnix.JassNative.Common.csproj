@@ -40,7 +40,6 @@
   <ItemGroup>
     <Compile Include="JassMemory.cs" />
     <Compile Include="JassMiscellaneous.cs" />
-    <None Include="JassLocalTimer.cs" />
     <Compile Include="JassStopwatch.cs" />
     <Compile Include="JassString.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

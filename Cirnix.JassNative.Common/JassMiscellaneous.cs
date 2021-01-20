@@ -101,18 +101,16 @@ namespace Cirnix.JassNative.Common
             StormDll = Kernel32.GetModuleHandle("storm.dll");
         }
 
-        public void OnMapStart()
+        public void OnMapLoad()
         {
             Patch(GameDll + 0xD33DA4, 5f);
         }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
 
         public void OnMapEnd()
         {
             Patch(GameDll + 0xD33DA4, 5f);
         }
+
+        public void OnProgramExit() { }
     }
 }

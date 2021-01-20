@@ -30,15 +30,13 @@ namespace Cirnix.JassNative.YDWE
             Trace.Unindent();
         }
 
-        public void OnMapStart() { }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
+        public void OnMapLoad() { }
 
         public void OnMapEnd()
         {
             Wrapper.StateReset();
         }
+
+        public void OnProgramExit() { }
     }
 }

@@ -185,7 +185,7 @@ namespace Cirnix.JassNative.Runtime
             }
         }
 
-        internal static void OnMapStart()
+        internal static void OnMapLoad()
         {
             using (var listfileStream = new StormFileStream(SFile.OpenFileEx(IntPtr.Zero, "(listfile)", 0)))
             using (var listfileReader = new StreamReader(listfileStream))
@@ -212,25 +212,9 @@ namespace Cirnix.JassNative.Runtime
             }
 
             foreach (var mapPlugin in mapPlugins)
-                mapPlugin.OnMapStart();
+                mapPlugin.OnMapLoad();
             foreach (var plugin in plugins)
-                plugin.OnMapStart();
-        }
-
-        internal static void OnEngineStart()
-        {
-            foreach (var plugin in plugins)
-                plugin.OnEngineStart();
-            foreach (var mapPlugin in mapPlugins)
-                mapPlugin.OnEngineStart();
-        }
-
-        internal static void OnEngineEnd()
-        {
-            foreach (var plugin in plugins)
-                plugin.OnEngineEnd();
-            foreach (var mapPlugin in mapPlugins)
-                mapPlugin.OnEngineEnd();
+                plugin.OnMapLoad();
         }
 
         internal static void OnMapEnd()
@@ -240,6 +224,14 @@ namespace Cirnix.JassNative.Runtime
             foreach (var mapPlugin in mapPlugins)
                 mapPlugin.OnMapEnd();
             mapPlugins.Clear();
+        }
+
+        internal static void OnProgramExit()
+        {
+            foreach (var plugin in plugins)
+                plugin.OnProgramExit();
+            foreach (var mapPlugin in mapPlugins)
+                mapPlugin.OnProgramExit();
         }
     }
 }

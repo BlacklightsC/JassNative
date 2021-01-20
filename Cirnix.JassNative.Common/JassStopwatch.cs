@@ -6,7 +6,6 @@ using Cirnix.JassNative.Runtime.Plugin;
 
 namespace Cirnix.JassNative.Common
 {
-    [Requires(typeof(JassAPIPlugin))]
     public sealed class JassStopwatch : IPlugin
     {
         private int SwId = 0;
@@ -79,20 +78,18 @@ namespace Cirnix.JassNative.Common
 
         public void OnGameLoad() { }
 
-        public void OnMapStart()
+        public void OnMapLoad()
         {
             SwId = 0;
             list.Clear();
         }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
 
         public void OnMapEnd()
         {
             SwId = 0;
             list.Clear();
         }
+
+        public void OnProgramExit() { }
     }
 }

@@ -28,15 +28,13 @@ namespace Cirnix.JassNative.JassAPI
             Trace.Unindent();
         }
 
-        public void OnMapStart() { }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
+        public void OnMapLoad() { }
 
         public void OnMapEnd()
         {
             //Script.Release();
         }
+
+        public void OnProgramExit() { }
     }
 }

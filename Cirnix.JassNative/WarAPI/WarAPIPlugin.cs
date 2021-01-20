@@ -32,12 +32,10 @@ namespace Cirnix.JassNative.WarAPI
             //Trace.Unindent();
         }
 
-        public void OnMapStart() { }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
+        public void OnMapLoad() { }
 
         public void OnMapEnd() { }
+
+        public void OnProgramExit() { }
     }
 }

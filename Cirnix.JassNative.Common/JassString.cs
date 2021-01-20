@@ -6,7 +6,6 @@ using Cirnix.JassNative.Runtime.Plugin;
 
 namespace Cirnix.JassNative.Common
 {
-    [Requires(typeof(JassAPIPlugin))]
     public sealed class JassString : IPlugin
     {
         private delegate JassInteger StringPosPrototype(JassStringArg str, JassStringArg sub);
@@ -203,12 +202,10 @@ namespace Cirnix.JassNative.Common
 
         public void OnGameLoad() { }
 
-        public void OnMapStart() { }
-
-        public void OnEngineStart() { }
-
-        public void OnEngineEnd() { }
+        public void OnMapLoad() { }
 
         public void OnMapEnd() { }
+
+        public void OnProgramExit() { }
     }
 }
