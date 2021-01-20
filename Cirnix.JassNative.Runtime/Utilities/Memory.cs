@@ -161,7 +161,8 @@ namespace Cirnix.JassNative.Runtime.Utilities
                 catch { }
                 finally
                 {
-                    Kernel32.VirtualProtect(offset, 4, lpflOldProtect, out _);}
+                    Kernel32.VirtualProtect(offset, 4, lpflOldProtect, out _);
+                }
             }
             return 0;
         }
