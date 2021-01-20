@@ -8,7 +8,6 @@ using static Cirnix.JassNative.Runtime.Utilities.Memory;
 
 namespace Cirnix.JassNative.Common
 {
-    [Requires(typeof(JassAPIPlugin))]
     public sealed class JassMemory : IPlugin
     {
         private delegate JassInteger MemorySI(JassStringArg s);

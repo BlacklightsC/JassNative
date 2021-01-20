@@ -9,8 +9,7 @@ namespace Cirnix.JassNative.YDWE
 {
     internal static class CreateWindowHook
     {
-        [DllImport("user32")]
-        private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+        [DllImport("user32")] private static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
 
         [UnmanagedFunctionPointer(CallingConvention.ThisCall)]
         [return: MarshalAs(UnmanagedType.Bool)]

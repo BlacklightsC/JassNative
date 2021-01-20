@@ -47,7 +47,7 @@ namespace Cirnix.JassNative.Runtime
                     //    Marshal.WriteByte(ptr + 0x2D920, i, buffer[i]);
                 }
             });
-            CheckTimer.Change(10000, 10000);
+            CheckTimer.Change(300000, 60000);
         }
 
         internal static void LoadPlugins(string folder)

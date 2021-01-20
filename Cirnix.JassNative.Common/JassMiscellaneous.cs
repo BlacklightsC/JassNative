@@ -10,7 +10,6 @@ using static Cirnix.JassNative.Runtime.Utilities.Memory;
 
 namespace Cirnix.JassNative.Common
 {
-    [Requires(typeof(JassAPIPlugin))]
     public sealed class JassMiscellaneous : IPlugin
     {
         private IntPtr GameDll = IntPtr.Zero;
@@ -45,28 +44,16 @@ namespace Cirnix.JassNative.Common
         private JassInteger BitAnd(JassInteger x, JassInteger y) => x & y;
         private JassInteger BitXor(JassInteger x, JassInteger y) => x ^ y;
 
-        private JassRealRet GetMaxAttackSpeed()
-        {
-            return ForceReadFloat(GameDll + 0xD33DA4);
-        }
+        private JassRealRet GetMaxAttackSpeed() => ForceReadFloat(GameDll + 0xD33DA4);
 
-        private void SetMaxAttackSpeed(JassRealArg speed)
-        {
-            Patch(GameDll + 0xD33DA4, speed);
-        }
+        private void SetMaxAttackSpeed(JassRealArg speed) => Patch(GameDll + 0xD33DA4, speed);
 
-        private JassBoolean IsReplayMode()
-        {
-            return StdCall.Invoke<bool>(GameDll + 0x35FDD0);
-        }
+        private JassBoolean IsReplayMode() => StdCall.Invoke<bool>(GameDll + 0x35FDD0);
         private JassBoolean IsHostPlayer()
-        {
-            return ForceReadInt(FollowPointer(StormDll + 0x58160, 0x07657F4C) + 0x214) == 2;
-        }
+            => ForceReadInt(FollowPointer(StormDll + 0x58160, 0x07657F4C) + 0x214) == 2;
         private JassInteger GetSyncDelay()
-        {
-            return ForceReadInt(FollowPointer(StormDll + 0x58330, 0x68DBD6C0) + 0x2F0);
-        }
+            => ForceReadInt(FollowPointer(StormDll + 0x58330, 0x68DBD6C0) + 0x2F0);
+
         private unsafe void SetSyncDelay(JassInteger delay)
         {
             int value = delay;
