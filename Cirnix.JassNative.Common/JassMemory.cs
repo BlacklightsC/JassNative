@@ -1,14 +1,13 @@
 ﻿using System;
 
 using Cirnix.JassNative.JassAPI;
-using Cirnix.JassNative.Runtime.Plugin;
 using Cirnix.JassNative.Runtime.Windows;
 
 using static Cirnix.JassNative.Runtime.Utilities.Memory;
 
 namespace Cirnix.JassNative.Common
 {
-    public sealed class JassMemory : IPlugin
+    internal static class JassMemory
     {
         private delegate JassInteger MemorySI(JassStringArg s);
         private delegate JassInteger MemoryIII(JassInteger i_1, JassInteger i_2);
@@ -16,44 +15,34 @@ namespace Cirnix.JassNative.Common
         private delegate void MemoryIIV(JassInteger i_1, JassInteger i_2);
         private delegate JassRealRet MemoryIR(JassInteger i);
         private delegate void MemoryIRV(JassInteger i, JassRealArg r);
-        private JassInteger GetModuleHandle(JassStringArg moduleName)
-        {
-            return Kernel32.GetModuleHandle(moduleName).ToInt32();
-        }
-        private JassInteger FindModuleHandle(JassInteger offset, JassInteger signature)
-        {
-            return FollowPointer(new IntPtr(offset), signature).ToInt32();
-        }
+        private static JassInteger GetModuleHandle(JassStringArg moduleName)
+            => Kernel32.GetModuleHandle(moduleName).ToInt32();
 
-        private JassInteger MemoryGetByte(JassInteger offset)
+        private static JassInteger FindModuleHandle(JassInteger offset, JassInteger signature)
+            => FollowPointer(new IntPtr(offset), signature).ToInt32();
+
+        private static JassInteger MemoryGetByte(JassInteger offset)
         {
             byte[] buffer = ForceRead(new IntPtr(offset), 1);
             return buffer == null ? 0 : buffer[0];
         }
-        private void MemorySetByte(JassInteger offset, JassInteger value)
-        {
-            Patch(new IntPtr(offset), (byte)value);
-        }
 
-        private JassInteger MemoryGetInteger(JassInteger offset)
-        {
-            return ForceReadInt(new IntPtr(offset));
-        }
-        private void MemorySetInteger(JassInteger offset, JassInteger value)
-        {
-            Patch(new IntPtr(offset), value);
-        }
+        private static void MemorySetByte(JassInteger offset, JassInteger value)
+            => Patch(new IntPtr(offset), (byte)value);
 
-        private JassRealRet MemoryGetReal(JassInteger offset)
-        {
-            return ForceReadFloat(new IntPtr(offset));
-        }
-        private void MemorySetReal(JassInteger offset, JassRealArg value)
-        {
-            Patch(new IntPtr(offset), value);
-        }
+        private static JassInteger MemoryGetInteger(JassInteger offset)
+            => ForceReadInt(new IntPtr(offset));
 
-        public void Initialize()
+        private static void MemorySetInteger(JassInteger offset, JassInteger value)
+            => Patch(new IntPtr(offset), value);
+
+        private static JassRealRet MemoryGetReal(JassInteger offset)
+            => ForceReadFloat(new IntPtr(offset));
+
+        private static void MemorySetReal(JassInteger offset, JassRealArg value)
+            => Patch(new IntPtr(offset), value);
+
+        internal static void Initialize()
         {
             Natives.Add(new MemorySI(GetModuleHandle));
             Natives.Add(new MemoryIII(FindModuleHandle));
@@ -64,13 +53,5 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MemoryIR(MemoryGetReal));
             Natives.Add(new MemoryIRV(MemorySetReal));
         }
-
-        public void OnGameLoad() { }
-
-        public void OnMapLoad() { }
-
-        public void OnMapEnd() { }
-
-        public void OnProgramExit() { }
     }
 }

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 
 using Cirnix.JassNative.JassAPI;
-using Cirnix.JassNative.Runtime.Plugin;
 using Cirnix.JassNative.Runtime.Utilities.UnmanagedCalls;
 using Cirnix.JassNative.Runtime.Windows;
 
@@ -10,10 +9,10 @@ using static Cirnix.JassNative.Runtime.Utilities.Memory;
 
 namespace Cirnix.JassNative.Common
 {
-    public sealed class JassMiscellaneous : IPlugin
+    internal static class JassMiscellaneous
     {
-        private IntPtr GameDll = IntPtr.Zero;
-        private IntPtr StormDll = IntPtr.Zero;
+        private static IntPtr GameDll;
+        private static IntPtr StormDll;
 
         private delegate void MiscRVPrototype(JassRealArg r);
         private delegate void MiscIVPrototype(JassInteger i);
@@ -21,13 +20,13 @@ namespace Cirnix.JassNative.Common
         private delegate JassInteger MiscVIPrototype();
         private delegate JassBoolean MiscVBPrototype();
         private delegate void WriteLogPrototype(JassStringArg str);
-        private void WriteLog(JassStringArg str) => Trace.WriteLine(str.ToString());
+        private static void WriteLog(JassStringArg str) => Trace.WriteLine(str.ToString());
 
-        private void WriteLogReal(JassRealArg r) => Trace.WriteLine((float)r);
+        private static void WriteLogReal(JassRealArg r) => Trace.WriteLine((float)r);
 
         private delegate JassStringRet GetLocalDateTimePrototype();
-        private JassStringRet GetLocalDateTime() => DateTime.Now.ToString();
-        private JassInteger GetLocalUnixTime()
+        private static JassStringRet GetLocalDateTime() => DateTime.Now.ToString();
+        private static JassInteger GetLocalUnixTime()
         {
             try
             {
@@ -40,21 +39,21 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassInteger BitPrototype(JassInteger x, JassInteger y);
-        private JassInteger BitOr(JassInteger x, JassInteger y) => x | y;
-        private JassInteger BitAnd(JassInteger x, JassInteger y) => x & y;
-        private JassInteger BitXor(JassInteger x, JassInteger y) => x ^ y;
+        private static JassInteger BitOr(JassInteger x, JassInteger y) => x | y;
+        private static JassInteger BitAnd(JassInteger x, JassInteger y) => x & y;
+        private static JassInteger BitXor(JassInteger x, JassInteger y) => x ^ y;
 
-        private JassRealRet GetMaxAttackSpeed() => ForceReadFloat(GameDll + 0xD33DA4);
+        private static JassRealRet GetMaxAttackSpeed() => ForceReadFloat(GameDll + 0xD33DA4);
 
-        private void SetMaxAttackSpeed(JassRealArg speed) => Patch(GameDll + 0xD33DA4, speed);
+        private static void SetMaxAttackSpeed(JassRealArg speed) => Patch(GameDll + 0xD33DA4, speed);
 
-        private JassBoolean IsReplayMode() => StdCall.Invoke<bool>(GameDll + 0x35FDD0);
-        private JassBoolean IsHostPlayer()
+        private static JassBoolean IsReplayMode() => StdCall.Invoke<bool>(GameDll + 0x35FDD0);
+        private static JassBoolean IsHostPlayer()
             => ForceReadInt(FollowPointer(StormDll + 0x58160, 0x07657F4C) + 0x214) == 2;
-        private JassInteger GetSyncDelay()
+        private static JassInteger GetSyncDelay()
             => ForceReadInt(FollowPointer(StormDll + 0x58330, 0x68DBD6C0) + 0x2F0);
 
-        private unsafe void SetSyncDelay(JassInteger delay)
+        private static void SetSyncDelay(JassInteger delay)
         {
             int value = delay;
             value = value <= 10 ? 10 : value >= 550 ? 550 : value;
@@ -65,7 +64,7 @@ namespace Cirnix.JassNative.Common
                 Patch(ptr + i, value);
         }
 
-        public void Initialize()
+        internal static void Initialize()
         {
             Natives.Add(new WriteLogPrototype(WriteLog));
             Natives.Add(new MiscRVPrototype(WriteLogReal));
@@ -82,22 +81,12 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MiscIVPrototype(SetSyncDelay));
         }
 
-        public void OnGameLoad()
+        internal static void OnGameLoad()
         {
-            GameDll = Kernel32.GetModuleHandle("game.dll");
-            StormDll = Kernel32.GetModuleHandle("storm.dll");
+            GameDll = Kernel32.GetModuleHandle("Game.dll");
+            StormDll = Kernel32.GetModuleHandle("Storm.dll");
         }
 
-        public void OnMapLoad()
-        {
-            Patch(GameDll + 0xD33DA4, 5f);
-        }
-
-        public void OnMapEnd()
-        {
-            Patch(GameDll + 0xD33DA4, 5f);
-        }
-
-        public void OnProgramExit() { }
+        internal static void OnMapEnd() => Patch(GameDll + 0xD33DA4, 5f);
     }
 }

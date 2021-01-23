@@ -2,17 +2,16 @@
 using System.Text.RegularExpressions;
 
 using Cirnix.JassNative.JassAPI;
-using Cirnix.JassNative.Runtime.Plugin;
 
 namespace Cirnix.JassNative.Common
 {
-    public sealed class JassString : IPlugin
+    internal static class JassString
     {
         private delegate JassInteger StringPosPrototype(JassStringArg str, JassStringArg sub);
-        private JassInteger StringPos(JassStringArg str, JassStringArg sub) => str.ToString()?.IndexOf(sub);
+        private static JassInteger StringPos(JassStringArg str, JassStringArg sub) => str.ToString()?.IndexOf(sub);
 
         private delegate JassStringRet StringReversePrototype(JassStringArg str);
-        private JassStringRet StringReverse(JassStringArg str)
+        private static JassStringRet StringReverse(JassStringArg str)
         {
             char[] arr = (str.ToString() ?? string.Empty).ToCharArray();
             Array.Reverse(arr);
@@ -20,16 +19,12 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassStringRet StringTrimPrototype(JassStringArg str);
-        private JassStringRet StringTrim(JassStringArg str) => str.ToString()?.Trim();
-
-        private delegate JassStringRet StringTrimStartPrototype(JassStringArg str);
-        private JassStringRet StringTrimStart(JassStringArg str) => str.ToString()?.TrimStart();
-
-        private delegate JassStringRet StringTrimEndPrototype(JassStringArg str);
-        private JassStringRet StringTrimEnd(JassStringArg str) => str.ToString()?.TrimEnd();
+        private static JassStringRet StringTrim(JassStringArg str) => str.ToString()?.Trim();
+        private static JassStringRet StringTrimStart(JassStringArg str) => str.ToString()?.TrimStart();
+        private static JassStringRet StringTrimEnd(JassStringArg str) => str.ToString()?.TrimEnd();
 
         private delegate JassStringRet StringRegexPrototype(JassStringArg str, JassStringArg regex, JassInteger index);
-        private JassStringRet StringRegex(JassStringArg str, JassStringArg regex, JassInteger index)
+        private static JassStringRet StringRegex(JassStringArg str, JassStringArg regex, JassInteger index)
         {
             string Str = str.ToString(), Reg = regex.ToString();
             if (Str == null || Reg == null) return string.Empty;
@@ -38,7 +33,7 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassInteger StringCountPrototype(JassStringArg str, JassStringArg sub);
-        private JassInteger StringCount(JassStringArg str, JassStringArg sub)
+        private static JassInteger StringCount(JassStringArg str, JassStringArg sub)
         {
             string Str = str.ToString(), Sub = sub.ToString();
             if (Str == null || Sub == null) return 0;
@@ -46,7 +41,7 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassBoolean StringContainsPrototype(JassStringArg str, JassStringArg sub);
-        private JassBoolean StringContains(JassStringArg str, JassStringArg sub)
+        private static JassBoolean StringContains(JassStringArg str, JassStringArg sub)
         {
             string Str = str.ToString(), Sub = sub.ToString();
             if (Str == null || Sub == null) return false;
@@ -54,7 +49,7 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassStringRet StringSplitPrototype(JassStringArg str, JassStringArg sub, JassInteger index);
-        private JassStringRet StringSplit(JassStringArg str, JassStringArg sub, JassInteger index)
+        private static JassStringRet StringSplit(JassStringArg str, JassStringArg sub, JassInteger index)
         {
             string Str = str.ToString();
             if (string.IsNullOrEmpty(Str)) return string.Empty;
@@ -63,20 +58,20 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassStringRet StringReplacePrototype(JassStringArg str, JassStringArg old, JassStringArg newstr);
-        private JassStringRet StringReplace(JassStringArg str, JassStringArg old, JassStringArg newstr)
+        private static JassStringRet StringReplace(JassStringArg str, JassStringArg old, JassStringArg newstr)
         {
             return str.ToString()?.Replace(old.ToString() ?? string.Empty, newstr.ToString() ?? string.Empty) ?? string.Empty;
         }
 
         private delegate JassStringRet StringInsertPrototype(JassStringArg str, JassInteger index, JassStringArg val);
-        private JassStringRet StringInsert(JassStringArg str, JassInteger index, JassStringArg val)
+        private static JassStringRet StringInsert(JassStringArg str, JassInteger index, JassStringArg val)
         {
             int idx = index >= 0 ? (int)index : 0;
             return (str.ToString() ?? string.Empty).PadRight(idx).Insert(idx, val.ToString() ?? string.Empty);
         }
 
         private delegate JassStringRet StringSubPrototype(JassStringArg str, JassInteger start, JassInteger length);
-        private JassStringRet StringSub(JassStringArg str, JassInteger start, JassInteger length)
+        private static JassStringRet StringSub(JassStringArg str, JassInteger start, JassInteger length)
         {
             string Str = str.ToString();
             int Start = start, Length = length;
@@ -91,10 +86,10 @@ namespace Cirnix.JassNative.Common
         }
 
         private delegate JassInteger StringLengthPrototype(JassStringArg str);
-        private JassInteger StringLength(JassStringArg str) => str.ToString()?.Length ?? 0;
+        private static JassInteger StringLength(JassStringArg str) => str.ToString()?.Length ?? 0;
 
         private delegate JassInteger StringCalcLinesPrototype(JassStringArg str, JassInteger length);
-        private JassInteger StringCalcLines(JassStringArg str, JassInteger length)
+        private static JassInteger StringCalcLines(JassStringArg str, JassInteger length)
         {
             string Str = str.ToString();
             int Length = length;
@@ -182,13 +177,13 @@ namespace Cirnix.JassNative.Common
             return ret;
         }
 
-        public void Initialize()
+        internal static void Initialize()
         {
             Natives.Add(new StringPosPrototype(StringPos));
             Natives.Add(new StringInsertPrototype(StringInsert));
             Natives.Add(new StringTrimPrototype(StringTrim));
-            Natives.Add(new StringTrimStartPrototype(StringTrimStart));
-            Natives.Add(new StringTrimEndPrototype(StringTrimEnd));
+            Natives.Add(new StringTrimPrototype(StringTrimStart));
+            Natives.Add(new StringTrimPrototype(StringTrimEnd));
             Natives.Add(new StringSplitPrototype(StringSplit));
             Natives.Add(new StringReplacePrototype(StringReplace));
             Natives.Add(new StringReversePrototype(StringReverse));
@@ -199,13 +194,5 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new StringLengthPrototype(StringLength));
             Natives.Add(new StringCalcLinesPrototype(StringCalcLines));
         }
-
-        public void OnGameLoad() { }
-
-        public void OnMapLoad() { }
-
-        public void OnMapEnd() { }
-
-        public void OnProgramExit() { }
     }
 }

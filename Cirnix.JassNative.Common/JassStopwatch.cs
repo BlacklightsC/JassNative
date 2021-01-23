@@ -2,67 +2,54 @@
 using System.Diagnostics;
 
 using Cirnix.JassNative.JassAPI;
-using Cirnix.JassNative.Runtime.Plugin;
 
 namespace Cirnix.JassNative.Common
 {
-    public sealed class JassStopwatch : IPlugin
+    internal static class JassStopwatch
     {
-        private int SwId = 0;
-        private Dictionary<int, Stopwatch> list = new Dictionary<int, Stopwatch>();
+        private static int SwId = 0;
+        private static readonly Dictionary<int, Stopwatch> list = new Dictionary<int, Stopwatch>();
 
         private delegate JassInteger StopwatchCreatePrototype();
-        private JassInteger StopwatchCreate()
+        private static JassInteger StopwatchCreate()
         {
             list[++SwId] = new Stopwatch();
             return SwId;
         }
         private delegate void StopwatchIVPrototype(JassInteger id);
-        private void StopwatchStart(JassInteger id)
+        private static void StopwatchStart(JassInteger id)
         {
             if (list.ContainsKey(id))
                 list[id].Start();
         }
-        private void StopwatchPause(JassInteger id)
+        private static void StopwatchPause(JassInteger id)
         {
             if (list.ContainsKey(id))
                 list[id].Stop();
         }
-        private void StopwatchReset(JassInteger id)
+        private static void StopwatchReset(JassInteger id)
         {
             if (list.ContainsKey(id))
                 list[id].Reset();
         }
-        private void StopwatchDestroy(JassInteger id)
-        {
-            list.Remove(id);
-        }
+        private static void StopwatchDestroy(JassInteger id)
+            => list.Remove(id);
 
         private delegate JassInteger StopwatchElapsedPrototype(JassInteger id);
-        private JassInteger StopwatchElapsedMS(JassInteger id)
-        {
-            return list.ContainsKey(id) ? list[id].ElapsedMilliseconds : 0;
-        }
-        private JassInteger StopwatchElapsedSecond(JassInteger id)
-        {
-            return list.ContainsKey(id) ? list[id].Elapsed.Seconds : 0;
-        }
-        private JassInteger StopwatchElapsedMinute(JassInteger id)
-        {
-            return list.ContainsKey(id) ? list[id].Elapsed.Minutes : 0;
-        }
-        private JassInteger StopwatchElapsedHour(JassInteger id)
-        {
-            return list.ContainsKey(id) ? list[id]?.Elapsed.Hours : 0;
-        }
+        private static JassInteger StopwatchElapsedMS(JassInteger id)
+            => list.ContainsKey(id) ? list[id].ElapsedMilliseconds : 0;
+        private static JassInteger StopwatchElapsedSecond(JassInteger id)
+            => list.ContainsKey(id) ? list[id].Elapsed.Seconds : 0;
+        private static JassInteger StopwatchElapsedMinute(JassInteger id)
+            => list.ContainsKey(id) ? list[id].Elapsed.Minutes : 0;
+        private static JassInteger StopwatchElapsedHour(JassInteger id)
+            => list.ContainsKey(id) ? list[id]?.Elapsed.Hours : 0;
 
         private delegate JassRealRet StopwatchElapsedTickPrototype(JassInteger id);
-        private JassRealRet StopwatchTick(JassInteger id)
-        {
-            return list.ContainsKey(id) ? (float)list[id]?.ElapsedTicks : 0f;
-        }
+        private static JassRealRet StopwatchTick(JassInteger id)
+            => list.ContainsKey(id) ? (float)list[id]?.ElapsedTicks : 0f;
 
-        public void Initialize()
+        internal static void Initialize()
         {
             Natives.Add(new StopwatchCreatePrototype(StopwatchCreate));
             Natives.Add(new StopwatchIVPrototype(StopwatchStart));
@@ -76,20 +63,10 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new StopwatchElapsedTickPrototype(StopwatchTick));
         }
 
-        public void OnGameLoad() { }
-
-        public void OnMapLoad()
+        internal static void OnMapEnd()
         {
             SwId = 0;
             list.Clear();
         }
-
-        public void OnMapEnd()
-        {
-            SwId = 0;
-            list.Clear();
-        }
-
-        public void OnProgramExit() { }
     }
 }
