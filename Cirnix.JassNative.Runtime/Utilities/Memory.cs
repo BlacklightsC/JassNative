@@ -27,6 +27,7 @@ namespace Cirnix.JassNative.Runtime.Utilities
             if (address == IntPtr.Zero) return null;
             int len = 0;
             while (Marshal.ReadByte(address, len) != 0) ++len;
+            if (len == 0) return string.Empty;
             byte[] buffer = new byte[len];
             Marshal.Copy(address, buffer, 0, buffer.Length);
             return Encoding.UTF8.GetString(buffer);
@@ -37,6 +38,7 @@ namespace Cirnix.JassNative.Runtime.Utilities
             if (address == IntPtr.Zero) return null;
             int len = 0;
             while (Marshal.ReadByte(address, len) != 0 && len != length) ++len;
+            if (len == 0) return string.Empty;
             byte[] buffer = new byte[len];
             Marshal.Copy(address, buffer, 0, buffer.Length);
             return Encoding.UTF8.GetString(buffer);
@@ -136,16 +138,17 @@ namespace Cirnix.JassNative.Runtime.Utilities
         {
             if (Kernel32.VirtualProtect(offset, size, 0x40, out uint lpflOldProtect))
             {
-                byte[] lpBuffer = new byte[size];
-                byte* pointer = (byte*)offset;
-                for (int i = 0; i < size; i++)
-                    try
-                    {
-                        lpBuffer[i] = *pointer++;
-                    }
-                    catch { break; }
-                Kernel32.VirtualProtect(offset, size, lpflOldProtect, out _);
-                return lpBuffer;
+                try
+                {
+                    byte[] lpBuffer = new byte[size];
+                    Marshal.Copy(offset, lpBuffer, 0, size);
+                    return lpBuffer;
+                }
+                catch { }
+                finally
+                {
+                    Kernel32.VirtualProtect(offset, size, lpflOldProtect, out _);
+                }
             }
             return null;
         }
@@ -184,17 +187,15 @@ namespace Cirnix.JassNative.Runtime.Utilities
             return 0;
         }
 
-        public unsafe static void Patch(IntPtr offset, params byte[] buffer)
+        public static void Patch(IntPtr offset, params byte[] buffer)
         {
             if (Kernel32.VirtualProtect(offset, buffer.Length, 0x40, out uint lpflOldProtect))
             {
-                byte* pointer = (byte*)offset;
-                for (int i = 0; i < buffer.Length; i++)
-                    try
-                    {
-                        *pointer++ = buffer[i];
-                    }
-                    catch { break; }
+                try
+                {
+                    Marshal.Copy(buffer, 0, offset, buffer.Length);
+                }
+                catch { }
                 Kernel32.VirtualProtect(offset, buffer.Length, lpflOldProtect, out _);
             }
         }
@@ -227,7 +228,7 @@ namespace Cirnix.JassNative.Runtime.Utilities
 
         public unsafe static IntPtr FollowPointer(IntPtr offset, int signature)
         {
-            offset = new IntPtr(ForceReadInt(offset));
+            offset = FollowPointer(offset);
             int* pointer = (int*)offset;
             while (Kernel32.VirtualProtect(offset, 8, 0x40, out uint lpflOldProtect))
             {
@@ -245,7 +246,19 @@ namespace Cirnix.JassNative.Runtime.Utilities
 
         public static IntPtr FollowPointer(IntPtr offset)
         {
-            return new IntPtr(ForceReadInt(offset));
+            if (Kernel32.VirtualProtect(offset, 4, 0x40, out uint lpflOldProtect))
+            {
+                try
+                {
+                    return Marshal.ReadIntPtr(offset);
+                }
+                catch { }
+                finally
+                {
+                    Kernel32.VirtualProtect(offset, 4, lpflOldProtect, out _);
+                }
+            }
+            return IntPtr.Zero;
         }
     }
 }
