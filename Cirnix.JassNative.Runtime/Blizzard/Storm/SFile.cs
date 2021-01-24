@@ -31,9 +31,7 @@ namespace Cirnix.JassNative.Runtime.Blizzard.Storm
 
         public static IntPtr OpenFileEx(IntPtr handle, string filename, uint mode)
         {
-            if (OpenFileEx(handle, filename, mode, out IntPtr result))
-                return result;
-            return IntPtr.Zero;
+            return OpenFileEx(handle, filename, mode, out IntPtr result) ? result : IntPtr.Zero;
         }
 
         public static int ReadFile(IntPtr handle, byte[] buffer, int numberOfBytesToRead, out int numberOfBytesRead, int distanceToMoveHigh = 0)
@@ -46,7 +44,7 @@ namespace Cirnix.JassNative.Runtime.Blizzard.Storm
         {
             int size = GetFileSize(handle);
             var buffer = Marshal.AllocHGlobal(size);
-            ReadFile(handle, buffer, size, out int read);
+            ReadFile(handle, buffer, size, out _);
             var output = new byte[size];
             Marshal.Copy(buffer, output, 0, size);
             Marshal.FreeHGlobal(buffer);

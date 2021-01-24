@@ -238,8 +238,6 @@ namespace Cirnix.JassNative.Runtime
             switch (fileName.ToLower())
             {
                 case "game.dll":
-                    Stopwatch sw = new Stopwatch();
-
                     PluginSystem.OnGameLoad();
 
                     // Prepare the Unknown__SetState hook.

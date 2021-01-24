@@ -15,7 +15,7 @@ using Cirnix.JassNative.WarAPI.Types;
 
 namespace Cirnix.JassNative.JassDebugger
 {
-    public static class JassDebugger
+	public static class JassDebugger
 	{
 		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
 		private delegate IntPtr sub_6F88FAB0Prototype(StringPtr cheatPtr);
@@ -172,7 +172,7 @@ namespace Cirnix.JassNative.JassDebugger
 					return value.ToString("X6");
 				case JassType.Boolean:
 					switch ((int)value)
-                    {
+					{
 						case 0: return "false";
 						case 1: return "true";
 						default: return "(boolean)" + (int)value;
@@ -469,13 +469,9 @@ namespace Cirnix.JassNative.JassDebugger
 			}
 		}
 
-		private static void HandleLocalDump(List<string> commands)
-		{
-		}
+		private static void HandleLocalDump(List<string> commands) { }
 
-		private static void HandleTest(List<string> commands)
-		{
-		}
+		private static void HandleTest(List<string> commands) { }
 
 		private static IntPtr sub_6F88FAB0Hook(StringPtr cheat)
 		{
@@ -520,7 +516,7 @@ namespace Cirnix.JassNative.JassDebugger
 				text = "unknown function";
 			string str = string.Empty;
 			switch (result)
-            {
+			{
 				case CodeResult.OpLimit: str = $"[Debugger] |cffff0000Error|r: Op limit({opLimit}) exceeded in {text}."; break;
 				case CodeResult.VariableUninitialized: str = $"[Debugger] |cffff0000Error|r: Uninitialized variable read in {text}."; break;
 				case CodeResult.DivideByZero: str = $"[Debugger] |cffff0000Error|r: Divide by zero in {text}."; break;

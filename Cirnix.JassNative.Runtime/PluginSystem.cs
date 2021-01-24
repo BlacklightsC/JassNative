@@ -8,7 +8,6 @@ using System.Threading;
 using System.Windows;
 
 using Cirnix.JassNative.Runtime.Plugin;
-using Cirnix.JassNative.Runtime.Blizzard.Storm;
 using Cirnix.JassNative.Runtime.Utilities;
 using Cirnix.JassNative.Runtime.Windows;
 
@@ -187,6 +186,7 @@ namespace Cirnix.JassNative.Runtime
 
         internal static void OnMapLoad()
         {
+            /*
             using (var listfileStream = new StormFileStream(SFile.OpenFileEx(IntPtr.Zero, "(listfile)", 0)))
             using (var listfileReader = new StreamReader(listfileStream))
             {
@@ -210,6 +210,7 @@ namespace Cirnix.JassNative.Runtime
                     }
                 }
             }
+            */
 
             foreach (var mapPlugin in mapPlugins)
                 mapPlugin.OnMapLoad();
