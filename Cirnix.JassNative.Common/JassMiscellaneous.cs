@@ -38,11 +38,6 @@ namespace Cirnix.JassNative.Common
             }
         }
 
-        private delegate JassInteger BitPrototype(JassInteger x, JassInteger y);
-        private static JassInteger BitOr(JassInteger x, JassInteger y) => x | y;
-        private static JassInteger BitAnd(JassInteger x, JassInteger y) => x & y;
-        private static JassInteger BitXor(JassInteger x, JassInteger y) => x ^ y;
-
         private static JassRealRet GetMaxAttackSpeed() => ForceReadFloat(GameDll + 0xD33DA4);
 
         private static void SetMaxAttackSpeed(JassRealArg speed) => Patch(GameDll + 0xD33DA4, speed);
@@ -70,9 +65,6 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MiscRVPrototype(WriteLogReal));
             Natives.Add(new GetLocalDateTimePrototype(GetLocalDateTime));
             Natives.Add(new MiscVIPrototype(GetLocalUnixTime));
-            Natives.Add(new BitPrototype(BitOr), false);
-            Natives.Add(new BitPrototype(BitAnd), false);
-            Natives.Add(new BitPrototype(BitXor), false);
             Natives.Add(new MiscVRPrototype(GetMaxAttackSpeed));
             Natives.Add(new MiscRVPrototype(SetMaxAttackSpeed));
             Natives.Add(new MiscVBPrototype(IsReplayMode), false);

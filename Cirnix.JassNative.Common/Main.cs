@@ -6,6 +6,7 @@ namespace Cirnix.JassNative.Common
     {
         public void Initialize()
         {
+            JassConvert.Initialize();
             JassMemory.Initialize();
             JassMiscellaneous.Initialize();
             JassStopwatch.Initialize();
