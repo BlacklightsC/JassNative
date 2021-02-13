@@ -18,7 +18,7 @@ namespace Cirnix.JassNative.JassDebugger
 	public static class JassDebugger
 	{
 		[UnmanagedFunctionPointer(CallingConvention.ThisCall)]
-		private delegate IntPtr sub_6F88FAB0Prototype(StringPtr cheatPtr);
+		private delegate IntPtr sub_6F1CA210Prototype(StringPtr cheatPtr);
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		private delegate uint sub_6F924730Prototype();
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -26,7 +26,7 @@ namespace Cirnix.JassNative.JassDebugger
 		[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 		private delegate uint sub_6F929670Prototype();
 
-		private static sub_6F88FAB0Prototype sub_6F88FAB0;
+		private static sub_6F1CA210Prototype sub_6F1CA210;
 		private static sub_6F924730Prototype sub_6F924730;
 		private static sub_6F925F00Prototype sub_6F925F00;
 		private static sub_6F929670Prototype sub_6F929670;
@@ -127,7 +127,7 @@ namespace Cirnix.JassNative.JassDebugger
 				case OpCodeType.SetArray:
 				case OpCodeType.Native:
 				case OpCodeType.JassCall:
-					return text + split + (*ptr->SymbolTable->StringPool->Nodes + op->Argument * sizeof(StringNode*) / sizeof(StringNode*))->Value;
+					return text + split + (*(ptr->SymbolTable->StringPool->Nodes + op->Argument * sizeof(StringNode*) / sizeof(StringNode*)))->Value;
 				case OpCodeType.Literal:
 					switch (op->R2)
 					{
@@ -135,7 +135,7 @@ namespace Cirnix.JassNative.JassDebugger
 							text = $"{text}{split}{Memory.Read<float>(new IntPtr(&op->Argument))}";
 							goto IL_2FC;
 						case 6:
-							text = $"{text}{split}\"{(*ptr->SymbolTable->StringPool->Nodes + op->Argument * sizeof(StringNode*) / sizeof(StringNode*))->Value}\"";
+							text = $"{text}{split}\"{(*(ptr->SymbolTable->StringPool->Nodes + op->Argument * sizeof(StringNode*) / sizeof(StringNode*)))->Value}\"";
 							goto IL_2FC;
 						case 8:
 						{
@@ -186,6 +186,7 @@ namespace Cirnix.JassNative.JassDebugger
 		{
 			VirtualMachine* ptr = *GameFunctions.GetThreadLocalStorage()->Jass.AsUnsafe()->VirtualMachine;
 			string text = $"{variable->Type}{split}{variable->Type2}{split}{variable->Name.AsString()}";
+			string text2;
 			switch (variable->Type)
 			{
 				case JassType.IntegerArray:
@@ -201,14 +202,21 @@ namespace Cirnix.JassNative.JassDebugger
 						text += "[null]";
 					else
 					{
-						text += "[";
-						for (int i = 0; i < ptr2->Length; i++)
-						{
-							text += VariableValueToString(ptr2->Data[i * sizeof(IntPtr) / sizeof(IntPtr)], jassType);
-							if (i < ptr2->Length - 1)
-								text += ", ";
+                        try
+                        {
+							text2 = "[";
+							for (int i = 0; i < ptr2->Length; i++)
+							{
+								text2 += VariableValueToString(ptr2->Data[i * sizeof(IntPtr) / sizeof(IntPtr)], jassType);
+								if (i < ptr2->Length - 1)
+									text2 += ", ";
+							}
+							text += text2 + "]";
 						}
-						text += "]";
+                        catch
+                        {
+							text += "[null]";
+                        }
 					}
 					break;
 				}
@@ -233,6 +241,7 @@ namespace Cirnix.JassNative.JassDebugger
 					text = $"{text}0x{num + 1:X4}{ByteCodeToString(value + num, "\t")}{Environment.NewLine}";
 					num++;
 				}
+				Trace.WriteLine(text);
 				Trace.WriteLine($"Function '{name}'");
 			}
 			else
@@ -244,8 +253,8 @@ namespace Cirnix.JassNative.JassDebugger
 			using (FileStream fileStream = File.Open(filename, FileMode.Create, FileAccess.Write, FileShare.Write))
 			using (StreamWriter streamWriter = new StreamWriter(fileStream))
 			{
-				VirtualMachine* ptr = *GameFunctions.GetThreadLocalStorage()->Jass.AsUnsafe()->VirtualMachine;
-				HT_Node* ptr2 = ptr->FunctionTable->Lookup(name);
+			 	VirtualMachine* ptr = *GameFunctions.GetThreadLocalStorage()->Jass.AsUnsafe()->VirtualMachine;
+				HT_Node* ptr2 = ptr->FunctionTable->Lookup(name); 
 				if (ptr2 != null)
 				{
 					OpCode* value = (OpCode*)ptr2->Value;
@@ -335,7 +344,7 @@ namespace Cirnix.JassNative.JassDebugger
 		{
 			Script.VirtualMachine__RunCodeCallback += Jass_VirtualMachine__RunCodeCallback;
 			IntPtr moduleHandle = Kernel32.GetModuleHandle("game.dll");
-			sub_6F88FAB0 = Memory.InstallHook(moduleHandle + 0x88FAB0, new sub_6F88FAB0Prototype(sub_6F88FAB0Hook), true, false);
+			sub_6F1CA210 = Memory.InstallHook(moduleHandle + 0x1CA210, new sub_6F1CA210Prototype(sub_6F1CA210Hook), true, false);
 			sub_6F924730 = Memory.InstallHook(moduleHandle + 0x924730, new sub_6F924730Prototype(sub_6F924730Hook), true, false);
 			sub_6F925F00 = Memory.InstallHook(moduleHandle + 0x925F00, new sub_6F925F00Prototype(sub_6F925F00Hook), true, false);
 			sub_6F929670 = Memory.InstallHook(moduleHandle + 0x929670, new sub_6F929670Prototype(sub_6F929670Hook), true, false);
@@ -473,19 +482,26 @@ namespace Cirnix.JassNative.JassDebugger
 
 		private static void HandleTest(List<string> commands) { }
 
-		private static IntPtr sub_6F88FAB0Hook(StringPtr cheat)
+		private static IntPtr sub_6F1CA210Hook(StringPtr cheat)
 		{
-			List<string> list = SplitCommandLine(cheat.AsString()).ToList();
-			if (list.Count >= 2 && list[0].Equals("SCDBG", StringComparison.OrdinalIgnoreCase))
-				switch (list[1].ToUpper())
-				{
-					case "FUNCDUMP": HandleFuncDump(list.Skip(2).ToList()); break;
-					case "GLOBALDUMP": HandleGlobalDump(list.Skip(2).ToList()); break;
-					case "LOCALDUMP": HandleLocalDump(list.Skip(2).ToList()); break;
-					case "VARDUMP": HandleVarDump(list.Skip(2).ToList()); break;
-					case "TEST": HandleTest(list.Skip(2).ToList()); break;
-				}
-			return sub_6F88FAB0(cheat);
+			try
+			{
+				List<string> list = SplitCommandLine(cheat.AsString()).ToList();
+				if (list.Count >= 2 && list[0].Equals("SCDBG", StringComparison.OrdinalIgnoreCase))
+					switch (list[1].ToUpper())
+					{
+						case "FUNCDUMP": HandleFuncDump(list.Skip(2).ToList()); break;
+						case "GLOBALDUMP": HandleGlobalDump(list.Skip(2).ToList()); break;
+						case "LOCALDUMP": HandleLocalDump(list.Skip(2).ToList()); break;
+						case "VARDUMP": HandleVarDump(list.Skip(2).ToList()); break;
+						case "TEST": HandleTest(list.Skip(2).ToList()); break;
+					}
+			}
+			catch (Exception ex)
+			{
+				Trace.WriteLine(ex);
+			}
+			return sub_6F1CA210(cheat);
 		}
 
 		private static uint sub_6F924730Hook()

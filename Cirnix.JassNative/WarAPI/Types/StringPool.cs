@@ -19,7 +19,7 @@ namespace Cirnix.JassNative.WarAPI.Types
         public unsafe IntPtr AsIntPtr()
         {
             fixed (StringPool* stringPoolPtr = &this)
-                return new IntPtr((void*)stringPoolPtr);
+                return new IntPtr(stringPoolPtr);
         }
     }
 }

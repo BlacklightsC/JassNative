@@ -28,12 +28,15 @@ namespace Cirnix.JassNative.Runtime
         private static Dictionary<string, string> assemblies = new Dictionary<string, string>();
 
         private static Timer CheckTimer;
+        private static IntPtr GameDll;
+        public static bool Initialized = false;
 
         internal static void InitSystem()
         {
             CheckTimer = new Timer(item =>
             {
                 IntPtr ptr = Kernel32.GetModuleHandle("speedhack-i386.dll");
+                if (ptr == IntPtr.Zero) ptr = Kernel32.GetModuleHandle("inproc.dll");
                 if (ptr != IntPtr.Zero)
                 {
                     CheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
@@ -45,8 +48,33 @@ namespace Cirnix.JassNative.Runtime
                     //for (int i = 0; i < 4; i++)
                     //    Marshal.WriteByte(ptr + 0x2D920, i, buffer[i]);
                 }
+                else if (Initialized)
+                {
+                    if (Memory.ForceRead(GameDll + 0x210373, 1)[0] != 0x23
+                    ||  Memory.ForceRead(GameDll + 0x2104FF, 1)[0] != 0x75
+                    ||  Memory.ForceRead(GameDll + 0x2A1373, 1)[0] != 0x85
+                    ||  Memory.ForceRead(GameDll + 0x2A1376, 1)[0] != 0x84
+                    ||  Memory.ForceRead(GameDll + 0x2A1386, 1)[0] != 0x85
+                    ||  Memory.ForceRead(GameDll + 0x2A1389, 1)[0] != 0x84
+                    ||  Memory.ForceRead(GameDll + 0x3C2373, 1)[0] != 0x74
+                    ||  Memory.ForceRead(GameDll + 0x3E4048, 1)[0] != 0x74
+                    ||  Memory.ForceRead(GameDll + 0x3E4089, 1)[0] != 0x08
+                    ||  Memory.ForceRead(GameDll + 0x40AC9A, 1)[0] != 0x23
+                    ||  Memory.ForceRead(GameDll + 0x558237, 1)[0] != 0x84
+                    ||  Memory.ForceRead(GameDll + 0x6A2F03, 1)[0] != 0x75
+                    ||  Memory.ForceRead(GameDll + 0x6BFD17, 1)[0] != 0xC3
+                    ||  Memory.ForceRead(GameDll + 0x6BFFDE, 1)[0] != 0x75
+                    ||  Memory.ForceRead(GameDll + 0x791D1D, 1)[0] != 0x66
+                    ||  Memory.ForceRead(GameDll + 0x791D3E, 1)[0] != 0x85)
+                    {
+                        TimerCallback?.Invoke();
+                        Thread.Sleep(5000);
+                        Process.GetCurrentProcess().Kill();
+                    }
+                }
             });
             CheckTimer.Change(300000, 60000);
+            Initialized = true;
         }
 
         internal static void LoadPlugins(string folder)
@@ -160,6 +188,7 @@ namespace Cirnix.JassNative.Runtime
                 Trace.WriteLine("OnGameLoad plugins . . .");
                 Trace.Indent();
                 var sw = Stopwatch.StartNew();
+                GameDll = Kernel32.GetModuleHandle("Game.dll");
                 foreach (var plugin in plugins)
                 {
                     try
