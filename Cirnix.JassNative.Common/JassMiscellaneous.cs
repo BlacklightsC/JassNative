@@ -59,6 +59,12 @@ namespace Cirnix.JassNative.Common
                 Patch(ptr + i, value);
         }
 
+        // 0x424E4554 'BNET'
+        // 0x5443504E 'TCPN'
+        // 0x4C4F4F50 'LOOP'
+        // 0x4E4F4E45 'NONE'
+        private static JassInteger GetConnectionState() => Cdecl.Invoke<int>(GameDll + 0x35F6D0);
+
         internal static void Initialize()
         {
             Natives.Add(new WriteLogPrototype(WriteLog));
@@ -71,6 +77,7 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MiscVBPrototype(IsHostPlayer), false);
             Natives.Add(new MiscVIPrototype(GetSyncDelay));
             Natives.Add(new MiscIVPrototype(SetSyncDelay));
+            Natives.Add(new MiscVIPrototype(GetConnectionState));
         }
 
         internal static void OnGameLoad()

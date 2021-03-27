@@ -37,6 +37,7 @@ namespace Cirnix.JassNative.Runtime
             {
                 IntPtr ptr = Kernel32.GetModuleHandle("speedhack-i386.dll");
                 if (ptr == IntPtr.Zero) ptr = Kernel32.GetModuleHandle("inproc.dll");
+                if (ptr == IntPtr.Zero) ptr = Kernel32.GetModuleHandle("Speeder.dll");
                 if (ptr != IntPtr.Zero)
                 {
                     CheckTimer.Change(Timeout.Infinite, Timeout.Infinite);
