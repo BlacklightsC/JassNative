@@ -28,8 +28,8 @@ namespace Cirnix.JassNative.JassAPI
         private static VirtualMachine__RunFunctionPrototype VirtualMachine__RunFunction;
         private static VirtualMachine__RunCodePrototype VirtualMachine__RunCode;
 
-        private static Dictionary<string, Action> Prefix = new Dictionary<string, Action>();
-        private static Dictionary<string, Action> Postfix = new Dictionary<string, Action>();
+        //private static Dictionary<string, Action> Prefix = new Dictionary<string, Action>();
+        //private static Dictionary<string, Action> Postfix = new Dictionary<string, Action>();
 
         public static event VirtualMachine__RunCodeCallbackDelegate VirtualMachine__RunCodeCallback;
 
@@ -48,27 +48,27 @@ namespace Cirnix.JassNative.JassAPI
         //public static unsafe VirtualMachine* MainVM { get; private set; }
         //public static unsafe Thread MainThread { get; private set; }
 
-        public static bool InstallPrefixHook(string functionName, Action method)
-        {
-            if (Prefix.ContainsKey(functionName)) return false;
-            Prefix.Add(functionName, method);
-            return true;
-        }
-        public static void RemovePrefixHook(string functionName)
-        {
-            Prefix.Remove(functionName);
-        }
+        //public static bool InstallPrefixHook(string functionName, Action method)
+        //{
+        //    if (Prefix.ContainsKey(functionName)) return false;
+        //    Prefix.Add(functionName, method);
+        //    return true;
+        //}
+        //public static void RemovePrefixHook(string functionName)
+        //{
+        //    Prefix.Remove(functionName);
+        //}
 
-        public static bool InstallPostfixHook(string functionName, Action method)
-        {
-            if (Postfix.ContainsKey(functionName)) return false;
-            Postfix.Add(functionName, method);
-            return true;
-        }
-        public static void RemovePostfixHook(string functionName)
-        {
-            Postfix.Remove(functionName);
-        }
+        //public static bool InstallPostfixHook(string functionName, Action method)
+        //{
+        //    if (Postfix.ContainsKey(functionName)) return false;
+        //    Postfix.Add(functionName, method);
+        //    return true;
+        //}
+        //public static void RemovePostfixHook(string functionName)
+        //{
+        //    Postfix.Remove(functionName);
+        //}
 
         //public static unsafe void ExecuteFunc(string functionName)
         //{
@@ -112,13 +112,15 @@ namespace Cirnix.JassNative.JassAPI
             IntPtr num = IntPtr.Zero;
             try
             {
-                if (Prefix.ContainsKey(functionName)) Prefix[functionName]();
+                //Trace.WriteLine($"[RunFunction] {functionName} Start");
+                //if (Prefix.ContainsKey(functionName)) Prefix[functionName]();
                 //if (functionName == "main")
                 //{
                 //    MainVM = virtualMachine;
                 //}
                 num = VirtualMachine__RunFunction(virtualMachine, functionName, a3, a4, opLimit, a6);
-                if (Postfix.ContainsKey(functionName)) Postfix[functionName]();
+                //if (Postfix.ContainsKey(functionName)) Postfix[functionName]();
+                //Trace.WriteLine($"[RunFunction] {functionName} End");
             }
             catch (Exception ex)
             {
@@ -130,11 +132,13 @@ namespace Cirnix.JassNative.JassAPI
 
         private static unsafe CodeResult VirtualMachine__RunCodeHook(VirtualMachine* vm, OpCode* op, IntPtr a3, uint opLimit, IntPtr a5)
         {
-            //opLimit = 1000000;
+            //string value = vm->TryGetOpCodeFunctionName(op, out string name) ? name : null;
+            //if (value != null) Trace.WriteLine($"[RunCode] {name} Start");
             CodeResult result = VirtualMachine__RunCode(vm, op, a3, opLimit, a5);
             try
             {
                 VirtualMachine__RunCodeCallback?.Invoke(vm, op, a3, opLimit, a5, result);
+                //if (value != null) Trace.WriteLine($"[RunCode] {name} End");
             }
             catch (Exception ex)
             {
