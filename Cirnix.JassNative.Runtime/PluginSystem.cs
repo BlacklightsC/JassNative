@@ -23,7 +23,7 @@ namespace Cirnix.JassNative.Runtime
 
         private static List<IPlugin> plugins = new List<IPlugin>();
 
-        private static List<IMapPlugin> mapPlugins = new List<IMapPlugin>();
+        //private static List<IMapPlugin> mapPlugins = new List<IMapPlugin>();
 
         private static Dictionary<string, string> assemblies = new Dictionary<string, string>();
 
@@ -92,7 +92,13 @@ namespace Cirnix.JassNative.Runtime
                     {
                         string fileName = Path.GetFileName(file);
                         if (fileName == "Cirnix.JassNative.Runtime.dll") continue;
-                        Trace.WriteLine($"File: {fileName}");
+                        string version = "null";
+                        try
+                        {
+                            version = FileVersionInfo.GetVersionInfo(file).FileVersion;
+                        }
+                        catch { }
+                        Trace.WriteLine($"File: {fileName} ({version})");
                         Trace.Indent();
                         var assembly = Assembly.ReflectionOnlyLoadFrom(file);
                         foreach (var type in assembly.GetTypes().Where(t => t.Implements<IPlugin>()))
@@ -214,7 +220,7 @@ namespace Cirnix.JassNative.Runtime
             }
         }
 
-        internal static void OnMapLoad()
+        public static void OnMapLoad()
         {
             /*
             using (var listfileStream = new StormFileStream(SFile.OpenFileEx(IntPtr.Zero, "(listfile)", 0)))
@@ -242,8 +248,8 @@ namespace Cirnix.JassNative.Runtime
             }
             */
 
-            foreach (var mapPlugin in mapPlugins)
-                mapPlugin.OnMapLoad();
+            //foreach (var mapPlugin in mapPlugins)
+            //    mapPlugin.OnMapLoad();
             foreach (var plugin in plugins)
                 plugin.OnMapLoad();
         }
@@ -252,17 +258,17 @@ namespace Cirnix.JassNative.Runtime
         {
             foreach (var plugin in plugins)
                 plugin.OnMapEnd();
-            foreach (var mapPlugin in mapPlugins)
-                mapPlugin.OnMapEnd();
-            mapPlugins.Clear();
+            //foreach (var mapPlugin in mapPlugins)
+            //    mapPlugin.OnMapEnd();
+            //mapPlugins.Clear();
         }
 
         internal static void OnProgramExit()
         {
             foreach (var plugin in plugins)
                 plugin.OnProgramExit();
-            foreach (var mapPlugin in mapPlugins)
-                mapPlugin.OnProgramExit();
+            //foreach (var mapPlugin in mapPlugins)
+            //    mapPlugin.OnProgramExit();
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Threading;
 
+using Cirnix.JassNative.Runtime;
 using Cirnix.JassNative.Runtime.Utilities;
 using Cirnix.JassNative.Runtime.Windows;
 using Cirnix.JassNative.WarAPI;
@@ -112,6 +111,7 @@ namespace Cirnix.JassNative.JassAPI
             IntPtr num = IntPtr.Zero;
             try
             {
+                if (functionName == "config") PluginSystem.OnMapLoad();
                 //Trace.WriteLine($"[RunFunction] {functionName} Start");
                 //if (Prefix.ContainsKey(functionName)) Prefix[functionName]();
                 //if (functionName == "main")

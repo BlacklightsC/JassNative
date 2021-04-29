@@ -1,9 +1,10 @@
-﻿using Cirnix.JassNative.Runtime.Windows;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
+
+using Cirnix.JassNative.Runtime.Windows;
 
 namespace Cirnix.JassNative.Runtime.Utilities.UnmanagedCalls
 {

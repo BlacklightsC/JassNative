@@ -13,29 +13,29 @@ namespace Cirnix.JassNative.JassAPI
 
         public NativeDeclaration(IntPtr address)
         {
-            this.Prototype = Memory.ReadString(Memory.Read<IntPtr>(address, 1));
-            this.Name = Memory.ReadString(Memory.Read<IntPtr>(address, 6));
-            this.FunctionPtr = Memory.Read<IntPtr>(address, 11);
+            Prototype = Memory.ReadString(Memory.Read<IntPtr>(address, 1));
+            Name = Memory.ReadString(Memory.Read<IntPtr>(address, 6));
+            FunctionPtr = Memory.Read<IntPtr>(address, 11);
         }
 
         public NativeDeclaration(IntPtr function, string name, string prototype)
         {
-            this.FunctionPtr = function;
-            this.Name = name;
-            this.Prototype = prototype;
+            FunctionPtr = function;
+            Name = name;
+            Prototype = prototype;
         }
 
         public NativeDeclaration(Delegate function, string name, string prototype)
         {
-            this.Function = function;
-            this.FunctionPtr = Utility.FunctionAsPtr(function);
-            this.Name = name;
-            this.Prototype = prototype;
+            Function = function;
+            FunctionPtr = Utility.FunctionAsPtr(function);
+            Name = name;
+            Prototype = prototype;
         }
 
         public T ToDelegate<T>() where T : class
         {
-            return Utility.PtrAsFunction<T>(this.FunctionPtr);
+            return Utility.PtrAsFunction<T>(FunctionPtr);
         }
     }
 }
