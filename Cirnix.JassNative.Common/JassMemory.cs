@@ -15,6 +15,8 @@ namespace Cirnix.JassNative.Common
         private delegate void MemoryIIV(JassInteger i_1, JassInteger i_2);
         private delegate JassRealRet MemoryIR(JassInteger i);
         private delegate void MemoryIRV(JassInteger i, JassRealArg r);
+        private delegate JassStringRet MemoryIIS(JassInteger i_1, JassInteger i_2);
+        private delegate void MemoryISV(JassInteger i, JassStringArg s);
         private static JassInteger GetModuleHandle(JassStringArg moduleName)
             => Kernel32.GetModuleHandle(moduleName).ToInt32();
 
@@ -42,6 +44,18 @@ namespace Cirnix.JassNative.Common
         private static void MemorySetReal(JassInteger offset, JassRealArg value)
             => Patch(new IntPtr(offset), value);
 
+        private static JassStringRet MemoryGetString(JassInteger offset, JassInteger length)
+        {
+            if (length > 0)
+                return ReadString(new IntPtr(offset), length);
+            else
+                return ReadString(new IntPtr(offset));
+        }
+
+        private static void MemorySetString(JassInteger offset, JassStringArg value)
+            => WriteString(new IntPtr(offset), value);
+
+
         internal static void Initialize()
         {
             Natives.Add(new MemorySI(GetModuleHandle));
@@ -52,6 +66,8 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MemoryIIV(MemorySetInteger));
             Natives.Add(new MemoryIR(MemoryGetReal));
             Natives.Add(new MemoryIRV(MemorySetReal));
+            Natives.Add(new MemoryIIS(MemoryGetString));
+            Natives.Add(new MemoryISV(MemorySetString));
         }
     }
 }

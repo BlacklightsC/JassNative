@@ -26,7 +26,11 @@ namespace Cirnix.JassNative.Runtime.Utilities
         {
             if (address == IntPtr.Zero) return null;
             int len = 0;
-            while (Marshal.ReadByte(address, len) != 0) ++len;
+            try
+            {
+                while (Marshal.ReadByte(address, len) != 0) ++len;
+            }
+            catch { }
             if (len == 0) return string.Empty;
             byte[] buffer = new byte[len];
             Marshal.Copy(address, buffer, 0, buffer.Length);
@@ -37,7 +41,11 @@ namespace Cirnix.JassNative.Runtime.Utilities
         {
             if (address == IntPtr.Zero) return null;
             int len = 0;
-            while (Marshal.ReadByte(address, len) != 0 && len != length) ++len;
+            try
+            {
+                while (Marshal.ReadByte(address, len) != 0 && len != length) ++len;
+            }
+            catch { }
             if (len == 0) return string.Empty;
             byte[] buffer = new byte[len];
             Marshal.Copy(address, buffer, 0, buffer.Length);
@@ -56,8 +64,12 @@ namespace Cirnix.JassNative.Runtime.Utilities
 
         public static void WriteString(IntPtr address, string data)
         {
-            Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, address, Encoding.UTF8.GetByteCount(data));
-            Marshal.WriteByte(address + Encoding.UTF8.GetByteCount(data), 0x00); // null terminate
+            try
+            {
+                Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, address, Encoding.UTF8.GetByteCount(data));
+                Marshal.WriteByte(address + Encoding.UTF8.GetByteCount(data), 0x00); // null terminate
+            }
+            catch { }
         }
 
         public static T InstallHook<T>(IntPtr address, T newFunc, bool inclusive, bool exclusive) where T : class
