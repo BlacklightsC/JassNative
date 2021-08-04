@@ -167,7 +167,9 @@ namespace Cirnix.JassNative.JassDebugger
 				case JassType.Real:
 					return BitConverter.ToSingle(BitConverter.GetBytes((int)value), 0).ToString();
 				case JassType.String:
-					return $"\"{GameFunctions.JassStringHandleToString(GameFunctions.JassStringIndexToJassStringHandle((int)value))}\"";
+					int handle = (int)value;
+					if (handle == 0) return "null";
+					return $"\"{GameFunctions.JassStringHandleToString(GameFunctions.JassStringIndexToJassStringHandle(handle))}\"";
 				case JassType.Handle:
 					return value.ToString("X6");
 				case JassType.Boolean:
@@ -202,8 +204,8 @@ namespace Cirnix.JassNative.JassDebugger
 						text += "[null]";
 					else
 					{
-                        try
-                        {
+						try
+						{
 							text2 = "[";
 							for (int i = 0; i < ptr2->Length; i++)
 							{
@@ -213,10 +215,10 @@ namespace Cirnix.JassNative.JassDebugger
 							}
 							text += text2 + "]";
 						}
-                        catch
-                        {
+						catch
+						{
 							text += "[null]";
-                        }
+						}
 					}
 					break;
 				}
