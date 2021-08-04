@@ -13,14 +13,18 @@ namespace Cirnix.JassNative.WarAPI.Types
         public IntPtr field0010;
         public StringPtr Name;
         public JassType Type;
+        public byte field0019;
+        public short field001A;
         public JassType Type2;
+        public byte field001D;
+        public short field001E;
         public IntPtr Value;
-        public bool IsFunctionArgument;
+        [MarshalAs(UnmanagedType.Bool)] public bool IsFunctionArgument;
 
         public unsafe IntPtr AsIntPtr()
         {
             fixed (Variable* variablePtr = &this)
-                return new IntPtr((void*)variablePtr);
+                return new IntPtr(variablePtr);
         }
     }
 }
