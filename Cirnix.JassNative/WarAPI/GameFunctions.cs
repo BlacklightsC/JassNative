@@ -120,7 +120,7 @@ namespace Cirnix.JassNative.WarAPI
 
         public static string JassStringHandleToString(IntPtr jassStringHandle)
         {
-            return Memory.PtrAsString(FastCall.Invoke<IntPtr>(GameAddresses.JassStringHandleToString, jassStringHandle));
+            return Memory.PtrAsString(ThisCall.Invoke<IntPtr>(GameAddresses.JassStringHandleToString, jassStringHandle));
         }
 
         public static unsafe IntPtr sub_6F08AE90(int* a1)
@@ -135,7 +135,7 @@ namespace Cirnix.JassNative.WarAPI
 
         public static unsafe IntPtr JassStringIndexToJassStringHandle(int jassStringIndex)
         {
-            return Marshal.ReadIntPtr(Marshal.ReadIntPtr(Marshal.ReadIntPtr(Marshal.ReadIntPtr(GetThreadLocalStorage()->Jass.AsIntPtr(), 0xC)), 0x2874), 8) + 8 + 0x10 * jassStringIndex;
+            return Marshal.ReadIntPtr(Marshal.ReadIntPtr(Marshal.ReadIntPtr(Marshal.ReadIntPtr(GetThreadLocalStorage()->Jass.AsIntPtr(), 0xC)), 0x2874), 8) + 0x10 * jassStringIndex;
         }
     }
 }
