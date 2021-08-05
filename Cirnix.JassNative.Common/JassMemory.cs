@@ -1,6 +1,7 @@
 ﻿using System;
 
 using Cirnix.JassNative.JassAPI;
+using Cirnix.JassNative.Runtime.Utilities.UnmanagedCalls;
 using Cirnix.JassNative.Runtime.Windows;
 
 using static Cirnix.JassNative.Runtime.Utilities.Memory;
@@ -55,6 +56,72 @@ namespace Cirnix.JassNative.Common
         private static void MemorySetString(JassInteger offset, JassStringArg value)
             => WriteString(new IntPtr(offset), value);
 
+        private const int ProcCallKey = 0x0DA7883F; // StringHash("jass")
+        private delegate JassBoolean ProcCallPrototype(JassInteger callConv, JassInteger address, JassHashTable ht);
+        private static JassBoolean ProcCall(JassInteger callConv, JassInteger address, JassHashTable ht)
+        {
+            if (ht.Handle == IntPtr.Zero) return false;
+            try
+            {
+                IntPtr ptr = new IntPtr(address);
+                string Params = Natives.LoadStr(ht, ProcCallKey, 0);
+                string takes = Params.Substring(1, Params.IndexOf(')') - 1);
+                char returns = Params[Params.Length - 1];
+                object[] param = new object[takes.Length];
+                for (int i = 0; i < takes.Length; i++)
+                    switch (takes[i])
+                    {
+                        case 'I': param[i] = Natives.LoadInteger(ht, ProcCallKey, i + 1); break;
+                        case 'R': param[i] = Natives.LoadReal(ht, ProcCallKey, i + 1); break;
+                        case 'B': param[i] = Natives.LoadBoolean(ht, ProcCallKey, i + 1); break;
+                        case 'S': param[i] = Natives.LoadStr(ht, ProcCallKey, i + 1); break;
+                    }
+                switch (callConv)
+                {
+                    case 1:
+                        switch (returns)
+                        {
+                            case 'V': Cdecl.Invoke<IntPtr>(ptr, param); break;
+                            case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, Cdecl.Invoke<int>(ptr, param)); break;
+                            case 'R': Natives.SaveReal(ht, ProcCallKey, 0, Cdecl.Invoke<float>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, Cdecl.Invoke<bool>(ptr, param)); break;
+                        }
+                        break;
+                    case 2:
+                        switch (returns)
+                        {
+                            case 'V': StdCall.Invoke<IntPtr>(ptr, param); break;
+                            case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, StdCall.Invoke<int>(ptr, param)); break;
+                            case 'R': Natives.SaveReal(ht, ProcCallKey, 0, StdCall.Invoke<float>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, StdCall.Invoke<bool>(ptr, param)); break;
+                        }
+                        break;
+                    case 3:
+                        switch (returns)
+                        {
+                            case 'V': FastCall.Invoke<IntPtr>(ptr, param); break;
+                            case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, FastCall.Invoke<int>(ptr, param)); break;
+                            case 'R': Natives.SaveReal(ht, ProcCallKey, 0, FastCall.Invoke<float>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, FastCall.Invoke<bool>(ptr, param)); break;
+                        }
+                        break;
+                    case 4:
+                        switch (returns)
+                        {
+                            case 'V': ThisCall.Invoke<IntPtr>(ptr, param); break;
+                            case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, ThisCall.Invoke<int>(ptr, param)); break;
+                            case 'R': Natives.SaveReal(ht, ProcCallKey, 0, ThisCall.Invoke<float>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, ThisCall.Invoke<bool>(ptr, param)); break;
+                        }
+                        break;
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         internal static void Initialize()
         {
@@ -68,6 +135,7 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MemoryIRV(MemorySetReal));
             Natives.Add(new MemoryIIS(MemoryGetString));
             Natives.Add(new MemoryISV(MemorySetString));
+            Natives.Add(new ProcCallPrototype(ProcCall));
         }
     }
 }
