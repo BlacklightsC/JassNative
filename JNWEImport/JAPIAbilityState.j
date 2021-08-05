@@ -241,7 +241,7 @@ function JNSetUnitAbilityCooldown takes unit whichUnit, integer abilId, integer 
 static if REFORGED_MODE then
     call BlzSetUnitAbilityCooldown(whichUnit, abilId, level, cooldown)
 else
-    call EXSetAbilityState(EXGetUnitAbility(whichUnit, abilId), ABILITY_DATA_COOL, cooldown)
+    call EXSetAbilityDataReal(EXGetUnitAbility(whichUnit, abilId), level, ABILITY_DATA_COOL, cooldown)
 endif
 endfunction
 

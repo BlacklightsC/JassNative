@@ -21,6 +21,8 @@ else
     native JNGetSyncDelay takes nothing returns integer
     native JNSetSyncDelay takes integer delay returns nothing
     native JNGetConnectionState takes nothing returns integer
+    
+    native JNProcessStart takes string fileName, string arguments returns boolean
 endif
 
 function JNBitOr takes integer x, integer y returns integer
