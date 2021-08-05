@@ -15,7 +15,7 @@ static if not REFORGED_MODE then
     native JNMemoryGetByte takes integer offset returns integer
     native JNMemorySetByte takes integer offset, integer value returns nothing
     native JNMemoryGetInteger takes integer offset returns integer
-    native JNMemorySetInteger takes integer offset, integer value returns nothingD
+    native JNMemorySetInteger takes integer offset, integer value returns nothing
     native JNMemoryGetReal takes integer offset returns real
     native JNMemorySetReal takes integer offset, real value returns nothing
     native JNMemoryGetString takes integer offset, integer length returns string

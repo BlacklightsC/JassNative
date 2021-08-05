@@ -127,7 +127,7 @@ namespace Cirnix.JassNative.JassDebugger
 				case OpCodeType.SetArray:
 				case OpCodeType.Native:
 				case OpCodeType.JassCall:
-					return text + split + (*(ptr->SymbolTable->StringPool->Nodes + op->Argument * sizeof(StringNode*) / sizeof(StringNode*)))->Value;
+					return $"{text}{split}{(*(ptr->SymbolTable->StringPool->Nodes + op->Argument * sizeof(StringNode*) / sizeof(StringNode*)))->Value}";
 				case OpCodeType.Literal:
 					switch (op->R2)
 					{
