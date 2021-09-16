@@ -27,9 +27,9 @@ namespace Cirnix.JassNative.JassAPI
         private static VirtualMachine__RunFunctionPrototype VirtualMachine__RunFunction;
         private static VirtualMachine__RunCodePrototype VirtualMachine__RunCode;
 
+        //public static string CurrentRootFunction { get; private set; }
         //private static Dictionary<string, Action> Prefix = new Dictionary<string, Action>();
         //private static Dictionary<string, Action> Postfix = new Dictionary<string, Action>();
-
         public static event VirtualMachine__RunCodeCallbackDelegate VirtualMachine__RunCodeCallback;
 
         public static unsafe void Initialize()
@@ -133,6 +133,7 @@ namespace Cirnix.JassNative.JassAPI
         private static unsafe CodeResult VirtualMachine__RunCodeHook(VirtualMachine* vm, OpCode* op, IntPtr a3, uint opLimit, IntPtr a5)
         {
             //string value = vm->TryGetOpCodeFunctionName(op, out string name) ? name : null;
+            //CurrentRootFunction = value;
             //if (value != null) Trace.WriteLine($"[RunCode] {name} Start");
             CodeResult result = VirtualMachine__RunCode(vm, op, a3, opLimit, a5);
             try
@@ -145,6 +146,7 @@ namespace Cirnix.JassNative.JassAPI
                 Trace.WriteLine($"Unhandled Exception in {nameof(Script)}.{nameof(VirtualMachine__RunCodeHook)}!");
                 Trace.WriteLine(ex.ToString());
             }
+            //CurrentRootFunction = null;
             return result;
         }
     }

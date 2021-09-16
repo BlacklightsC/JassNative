@@ -66,8 +66,9 @@ namespace Cirnix.JassNative.Runtime.Utilities
         {
             try
             {
-                Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, address, Encoding.UTF8.GetByteCount(data));
-                Marshal.WriteByte(address + Encoding.UTF8.GetByteCount(data), 0x00); // null terminate
+                int length = Encoding.UTF8.GetByteCount(data);
+                Marshal.Copy(Encoding.UTF8.GetBytes(data), 0, address, length);
+                Marshal.WriteByte(address + length, 0x00); // null terminate
             }
             catch { }
         }

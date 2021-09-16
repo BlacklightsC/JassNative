@@ -38,7 +38,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="JassConvert.cs" />
+    <Compile Include="JassBit.cs" />
     <Compile Include="JassMemory.cs" />
     <Compile Include="JassMiscellaneous.cs" />
     <Compile Include="JassStopwatch.cs" />

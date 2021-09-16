@@ -76,6 +76,9 @@ namespace Cirnix.JassNative.Common
             catch { return false; }
         }
 
+        //private delegate JassStringRet GetRootFunctionNamePrototype();
+        //private static JassStringRet GetRootFunctionName() => Script.CurrentRootFunction;
+
         internal static void Initialize()
         {
             Natives.Add(new WriteLogPrototype(WriteLog));
@@ -90,6 +93,7 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new MiscIVPrototype(SetSyncDelay));
             Natives.Add(new MiscVIPrototype(GetConnectionState));
             Natives.Add(new ProcessStartPrototype(ProcessStart));
+            //Natives.Add(new GetRootFunctionNamePrototype(GetRootFunctionName));
         }
 
         internal static void OnGameLoad()

@@ -53,17 +53,25 @@ namespace Cirnix.JassNative.WarAPI.Types
 
         public unsafe bool TryGetOpCodeFunctionName(OpCode* op, out string name)
         {
-            while (op->OpType != OpCodeType.Function)
-            {
-                op += -1;
-                if (op < SymbolTable->FirstOperation)
+            //try
+            //{
+                while (op->OpType != OpCodeType.Function)
                 {
-                    name = string.Empty;
-                    return false;
+                    op += -1;
+                    if (op < SymbolTable->FirstOperation)
+                    {
+                        name = string.Empty;
+                        return false;
+                    }
                 }
+                name = SymbolTable->StringPool->Nodes[op->Argument]->Value;
+                return true;
             }
-            name = SymbolTable->StringPool->Nodes[op->Argument]->Value;
-            return true;
+            //catch
+            //{
+            //    name = string.Empty;
+            //    return false;
+            //}
         }
 
         public unsafe Variable*[] GetAllLocals()
