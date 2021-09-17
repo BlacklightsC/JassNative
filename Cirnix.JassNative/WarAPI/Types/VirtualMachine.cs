@@ -66,7 +66,7 @@ namespace Cirnix.JassNative.WarAPI.Types
                 }
                 name = SymbolTable->StringPool->Nodes[op->Argument]->Value;
                 return true;
-            }
+            //}
             //catch
             //{
             //    name = string.Empty;
