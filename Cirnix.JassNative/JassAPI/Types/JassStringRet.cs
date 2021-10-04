@@ -28,5 +28,10 @@ namespace Cirnix.JassNative.JassAPI
         {
             return GameFunctions.JassStringHandleToString(GameFunctions.JassStringIndexToJassStringHandle(Reference));
         }
+
+        public IntPtr GetIntPtr()
+        {
+            return GameFunctions.JassStringIndexToJassStringPointer(Reference);
+        }
     }
 }

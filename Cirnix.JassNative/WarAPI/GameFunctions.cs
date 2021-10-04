@@ -40,7 +40,7 @@ namespace Cirnix.JassNative.WarAPI
 
         public static unsafe IntPtr CGameUI__DisplayChatMessage(CGameUI* @this, int sender, string message, ChatRecipients recipients, float duration)
         {
-            return ThisCall.Invoke<IntPtr>(GameAddresses.CGameUI__DisplayChatMessage, (IntPtr)(void*)@this, sender, message, recipients, duration);
+            return ThisCall.Invoke<IntPtr>(GameAddresses.CGameUI__DisplayChatMessage, (IntPtr)@this, sender, message, recipients, duration);
         }
 
         public static bool Unknown__UpdateMouse(IntPtr @this, float uiX, float uiY, IntPtr terrainPtr, IntPtr a4)
@@ -80,7 +80,7 @@ namespace Cirnix.JassNative.WarAPI
 
         public static unsafe IntPtr JassStringManager__ResizePrototype(JassStringManager* @this, uint newSize)
         {
-            return ThisCall.Invoke<IntPtr>(GameAddresses.JassStringManager__Resize, new IntPtr((void*)@this), newSize);
+            return ThisCall.Invoke<IntPtr>(GameAddresses.JassStringManager__Resize, new IntPtr(@this), newSize);
         }
 
         public static IntPtr InitNatives()
@@ -105,12 +105,12 @@ namespace Cirnix.JassNative.WarAPI
 
         public static unsafe CodeResult VirtualMachine__RunCode(VirtualMachine* @this, IntPtr opCode, IntPtr a3, uint opLimit, IntPtr a5)
         {
-            return ThisCall.Invoke<CodeResult>(GameAddresses.VirtualMachine__RunCode, new IntPtr((void*)@this), opCode, a3, opLimit, a5);
+            return ThisCall.Invoke<CodeResult>(GameAddresses.VirtualMachine__RunCode, new IntPtr(@this), opCode, a3, opLimit, a5);
         }
 
         public static unsafe IntPtr VirtualMachine__RunFunction(VirtualMachine* @this, string functionName, IntPtr a3, IntPtr a4, IntPtr a5, IntPtr a6)
         {
-            return ThisCall.Invoke<IntPtr>(GameAddresses.VirtualMachine__RunFunction, new IntPtr((void*)@this), functionName, a3, a4, a5, a6);
+            return ThisCall.Invoke<IntPtr>(GameAddresses.VirtualMachine__RunFunction, new IntPtr(@this), functionName, a3, a4, a5, a6);
         }
 
         public static unsafe ThreadLocalStorage* GetThreadLocalStorage()
@@ -125,7 +125,7 @@ namespace Cirnix.JassNative.WarAPI
 
         public static unsafe IntPtr sub_6F08AE90(int* a1)
         {
-            return FastCall.Invoke<IntPtr>(GameAddresses.sub_6F08AE90, new IntPtr((void*)a1));
+            return FastCall.Invoke<IntPtr>(GameAddresses.sub_6F08AE90, new IntPtr(a1));
         }
 
         public static IntPtr WndProc(IntPtr hWnd, uint msg, uint wParam, uint lParam)
@@ -136,6 +136,12 @@ namespace Cirnix.JassNative.WarAPI
         public static unsafe IntPtr JassStringIndexToJassStringHandle(int jassStringIndex)
         {
             return Marshal.ReadIntPtr(Marshal.ReadIntPtr(Marshal.ReadIntPtr(Marshal.ReadIntPtr(GetThreadLocalStorage()->Jass.AsIntPtr(), 0xC)), 0x2874), 8) + 0x10 * jassStringIndex;
+        }
+
+        public static IntPtr JassStringIndexToJassStringPointer(int jassStringIndex)
+        {
+            IntPtr ptr = Marshal.ReadIntPtr(JassStringIndexToJassStringHandle(jassStringIndex), 8);
+            return ptr == IntPtr.Zero ? IntPtr.Zero : Marshal.ReadIntPtr(ptr, 0x1C);
         }
     }
 }

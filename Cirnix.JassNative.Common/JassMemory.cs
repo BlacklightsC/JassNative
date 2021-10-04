@@ -74,7 +74,7 @@ namespace Cirnix.JassNative.Common
                         case 'I': param[i] = Natives.LoadInteger(ht, ProcCallKey, i + 1); break;
                         case 'R': param[i] = Natives.LoadReal(ht, ProcCallKey, i + 1); break;
                         case 'B': param[i] = Natives.LoadBoolean(ht, ProcCallKey, i + 1); break;
-                        case 'S': param[i] = Natives.LoadStr(ht, ProcCallKey, i + 1); break;
+                        case 'S': param[i] = Natives.LoadStrPtr(ht, ProcCallKey, i + 1); break;
                     }
                 switch (callConv)
                 {

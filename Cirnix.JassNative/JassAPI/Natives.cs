@@ -5083,6 +5083,11 @@ namespace Cirnix.JassNative.JassAPI
             return _LoadStr(table, parentKey, childKey);
         }
 
+        public static IntPtr LoadStrPtr(JassHashTable table, JassInteger parentKey, JassInteger childKey)
+        {
+            return _LoadStr(table, parentKey, childKey).GetIntPtr();
+        }
+
         public static JassPlayer LoadPlayerHandle(JassHashTable table, JassInteger parentKey, JassInteger childKey)
         {
             return _LoadPlayerHandle(table, parentKey, childKey);

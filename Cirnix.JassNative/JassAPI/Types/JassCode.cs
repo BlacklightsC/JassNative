@@ -6,6 +6,8 @@ namespace Cirnix.JassNative.JassAPI
     [Serializable]
     public struct JassCode
     {
+        // 하단 오프셋의 배열 인덱스를 저장함 (CE)
+        // [[[[[Game.dll+D0DEF8]+14]+90]+4]+2888]+8
         public readonly IntPtr Handle;
 
         public JassCode(IntPtr handle)
