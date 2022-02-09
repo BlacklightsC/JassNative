@@ -1,4 +1,7 @@
 ﻿using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 
 using Cirnix.JassNative.JassAPI;
@@ -7,10 +10,13 @@ namespace Cirnix.JassNative.Common
 {
     internal static class JassString
     {
-        private delegate JassInteger StringPosPrototype(JassStringArg str, JassStringArg sub);
+        private delegate JassInteger StringSSI(JassStringArg s_1, JassStringArg s_2);
+        private delegate JassStringRet StringSS(JassStringArg s);
+        private delegate JassStringRet StringSSS(JassStringArg s_1, JassStringArg s_2);
+        private delegate JassStringRet StringSSIS(JassStringArg s_1, JassStringArg s_2, JassInteger i);
+
         private static JassInteger StringPos(JassStringArg str, JassStringArg sub) => str.ToString()?.IndexOf(sub);
 
-        private delegate JassStringRet StringReversePrototype(JassStringArg str);
         private static JassStringRet StringReverse(JassStringArg str)
         {
             char[] arr = (str.ToString() ?? string.Empty).ToCharArray();
@@ -18,12 +24,10 @@ namespace Cirnix.JassNative.Common
             return new string(arr);
         }
 
-        private delegate JassStringRet StringTrimPrototype(JassStringArg str);
         private static JassStringRet StringTrim(JassStringArg str) => str.ToString()?.Trim();
         private static JassStringRet StringTrimStart(JassStringArg str) => str.ToString()?.TrimStart();
         private static JassStringRet StringTrimEnd(JassStringArg str) => str.ToString()?.TrimEnd();
 
-        private delegate JassStringRet StringRegexPrototype(JassStringArg str, JassStringArg regex, JassInteger index);
         private static JassStringRet StringRegex(JassStringArg str, JassStringArg regex, JassInteger index)
         {
             string Str = str.ToString(), Reg = regex.ToString();
@@ -32,7 +36,6 @@ namespace Cirnix.JassNative.Common
             return 0 <= index && index < matches.Count ? matches[index].Value : string.Empty;
         }
 
-        private delegate JassInteger StringCountPrototype(JassStringArg str, JassStringArg sub);
         private static JassInteger StringCount(JassStringArg str, JassStringArg sub)
         {
             string Str = str.ToString(), Sub = sub.ToString();
@@ -48,7 +51,6 @@ namespace Cirnix.JassNative.Common
             return Str.Contains(Sub);
         }
 
-        private delegate JassStringRet StringSplitPrototype(JassStringArg str, JassStringArg sub, JassInteger index);
         private static JassStringRet StringSplit(JassStringArg str, JassStringArg sub, JassInteger index)
         {
             string Str = str.ToString();
@@ -177,22 +179,98 @@ namespace Cirnix.JassNative.Common
             return ret;
         }
 
+        private static JassStringRet StringEncrypt(JassStringArg plainText, JassStringArg key)
+        {
+            try
+            {
+                string Key = key;
+                using (Aes aes = Aes.Create())
+                using (Rfc2898DeriveBytes derive = new Rfc2898DeriveBytes(Key, Encoding.UTF8.GetBytes(Key.PadRight(8, '@'))))
+                {
+                    aes.Key = derive.GetBytes(32);
+                    aes.IV = derive.GetBytes(16);
+                    using (MemoryStream ms = new MemoryStream())
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
+                    {
+                        byte[] buffer = Encoding.UTF8.GetBytes(plainText);
+                        cs.Write(buffer, 0, buffer.Length);
+                        cs.FlushFinalBlock();
+                        return Convert.ToBase64String(ms.ToArray());
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        private static JassStringRet StringDecrypt(JassStringArg cipherText, JassStringArg key)
+        {
+            try
+            {
+                string Key = key;
+                using (Aes aes = Aes.Create())
+                using (Rfc2898DeriveBytes derive = new Rfc2898DeriveBytes(Key, Encoding.UTF8.GetBytes(Key.PadRight(8, '@'))))
+                {
+                    aes.Key = derive.GetBytes(32);
+                    aes.IV = derive.GetBytes(16);
+                    using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(cipherText)))
+                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
+                    using (StreamReader sr = new StreamReader(cs))
+                    {
+                        return sr.ReadToEnd();
+                    }
+                }
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private static JassStringRet StringFromBase64(JassStringArg str)
+        {
+            try
+            {
+                return Encoding.UTF8.GetString(Convert.FromBase64String(str));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+        private static JassStringRet StringToBase64(JassStringArg str)
+        {
+            try
+            {
+                return Convert.ToBase64String(Encoding.UTF8.GetBytes(str));
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
         internal static void Initialize()
         {
-            Natives.Add(new StringPosPrototype(StringPos));
+            Natives.Add(new StringSSI(StringPos));
             Natives.Add(new StringInsertPrototype(StringInsert));
-            Natives.Add(new StringTrimPrototype(StringTrim));
-            Natives.Add(new StringTrimPrototype(StringTrimStart));
-            Natives.Add(new StringTrimPrototype(StringTrimEnd));
-            Natives.Add(new StringSplitPrototype(StringSplit));
+            Natives.Add(new StringSS(StringTrim));
+            Natives.Add(new StringSS(StringTrimStart));
+            Natives.Add(new StringSS(StringTrimEnd));
+            Natives.Add(new StringSSIS(StringSplit));
             Natives.Add(new StringReplacePrototype(StringReplace));
-            Natives.Add(new StringReversePrototype(StringReverse));
+            Natives.Add(new StringSS(StringReverse));
             Natives.Add(new StringContainsPrototype(StringContains));
-            Natives.Add(new StringCountPrototype(StringCount));
-            Natives.Add(new StringRegexPrototype(StringRegex));
+            Natives.Add(new StringSSI(StringCount));
+            Natives.Add(new StringSSIS(StringRegex));
             Natives.Add(new StringSubPrototype(StringSub));
             Natives.Add(new StringLengthPrototype(StringLength));
             Natives.Add(new StringCalcLinesPrototype(StringCalcLines));
+            Natives.Add(new StringSS(StringFromBase64));
+            Natives.Add(new StringSS(StringToBase64));
+            Natives.Add(new StringSSS(StringEncrypt));
+            Natives.Add(new StringSSS(StringDecrypt));
         }
     }
 }
