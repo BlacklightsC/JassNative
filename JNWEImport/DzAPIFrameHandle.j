@@ -26,13 +26,14 @@ globals
 	constant integer JN_FRAMEEVENT_CHECKBOX_CHECKED       = 7
 	constant integer JN_FRAMEEVENT_CHECKBOX_UNCHECKED     = 8
 	constant integer JN_FRAMEEVENT_EDITBOX_TEXT_CHANGED   = 9
-	constant integer JN_FRAMEEVENT_POPUPMENU_ITEM_CHANGED = 10
-	constant integer JN_FRAMEEVENT_MOUSE_DOUBLECLICK      = 11
-	constant integer JN_FRAMEEVENT_SPRITE_ANIM_UPDATE     = 12
-	constant integer JN_FRAMEEVENT_SLIDER_VALUE_CHANGED   = 13
-	constant integer JN_FRAMEEVENT_DIALOG_CANCEL          = 14
-	constant integer JN_FRAMEEVENT_DIALOG_ACCEPT          = 15
-    constant integer JN_FRAMEEVENT_EDITBOX_ENTER          = 16
+
+	constant integer JN_FRAMEEVENT_POPUPMENU_ITEM_CHANGED = 11
+	constant integer JN_FRAMEEVENT_MOUSE_DOUBLECLICK      = 12
+	constant integer JN_FRAMEEVENT_SPRITE_ANIM_UPDATE     = 13
+	constant integer JN_FRAMEEVENT_SLIDER_VALUE_CHANGED   = 14
+	constant integer JN_FRAMEEVENT_DIALOG_CANCEL          = 15
+	constant integer JN_FRAMEEVENT_DIALOG_ACCEPT          = 16
+    constant integer JN_FRAMEEVENT_EDITBOX_ENTER          = 17
 
     constant real JN_FRAME_MAX_WIDTH                      = 0.8
     constant real JN_FRAME_MAX_HEIGHT                     = 0.6
@@ -420,21 +421,43 @@ else
 endif
 endfunction
 
+private function I2H takes integer value returns string
+    local string ret = null
+    local integer mod
+    loop
+        exitwhen value <= 0
+        set mod = ModuloInteger(value, 16)
+        set ret = SubString("0123456789ABCDEF", mod, mod + 1) + ret
+        set value = value / 16
+    endloop
+    return ret
+endfunction
+
 function JNGetFrameByName takes string name, integer createContext returns integer
 static if REFORGED_MODE then
     return F2I(BlzGetFrameByName(name, createContext))
 else
     local integer frame = DzFrameFindByName(name, createContext)
-    if frame == 0 then
-        set frame = DzSimpleFrameFindByName(name, createContext)
+    if frame != 0 then
+        debug call JNWriteLog("Found Frame: (" + name + ", " + I2S(createContext) + ") = 0x" + I2H(frame))
+        return frame
     endif
-    if frame == 0 then
-        set frame = DzSimpleFontStringFindByName(name, createContext)
+    set frame = DzSimpleFrameFindByName(name, createContext)
+    if frame != 0 then
+        debug call JNWriteLog("Found SimpleFrame: (" + name + ", " + I2S(createContext) + ") = 0x" + I2H(frame))
+        return frame
     endif
-    if frame == 0 then
-        set frame = DzSimpleTextureFindByName(name, createContext)
+    set frame = DzSimpleFontStringFindByName(name, createContext)
+    if frame != 0 then
+        debug call JNWriteLog("Found SimpleFontString: (" + name + ", " + I2S(createContext) + ") = 0x" + I2H(frame))
+        return frame
     endif
-    return frame
+    set frame = DzSimpleTextureFindByName(name, createContext)
+    if frame != 0 then
+        debug call JNWriteLog("Found SimpleTexture: (" + name + ", " + I2S(createContext) + ") = 0x" + I2H(frame))
+        return frame
+    endif
+    return 0
 endif
 endfunction
 
@@ -715,6 +738,9 @@ endfunction
 
 function JNTriggerRegisterFrameEvent takes trigger whichTrigger, integer frame, integer eventId returns nothing
 static if REFORGED_MODE then
+    if eventId > 10 then
+        set eventId = eventId - 1
+    endif
     call BlzTriggerRegisterFrameEvent(whichTrigger, I2F(frame), ConvertFrameEventType(eventId))
 else
     //Use JNFrameSetScript function

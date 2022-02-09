@@ -13,5 +13,9 @@ static if not REFORGED_MODE then
     native JNStringInsert takes string str, integer index, string val returns string
     native JNStringSub takes string str, integer start, integer length returns string
     native JNStringLength takes string str returns integer
+    native JNStringEncrypt takes string plainText, string key returns string
+    native JNStringDecrypt takes string cipherText, string key returns string
+    native JNStringFromBase64 takes string str returns string
+    native JNStringToBase64 takes string str returns string
 endif
 endlibrary
