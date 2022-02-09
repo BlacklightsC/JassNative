@@ -73,8 +73,8 @@ namespace Cirnix.JassNative.Common
                     {
                         case 'I': param[i] = Natives.LoadInteger(ht, ProcCallKey, i + 1); break;
                         case 'R': param[i] = Natives.LoadReal(ht, ProcCallKey, i + 1); break;
-                        case 'B': param[i] = Natives.LoadBoolean(ht, ProcCallKey, i + 1); break;
-                        case 'S': param[i] = Natives.LoadStrPtr(ht, ProcCallKey, i + 1); break;
+                        case 'B': param[i] = Natives.LoadBoolean(ht, ProcCallKey, i + 1) ? 1 : 0; break;
+                        case 'S': param[i] = Natives.LoadStrPtr(ht, ProcCallKey, i + 1).ToInt32(); break;
                     }
                 switch (callConv)
                 {
@@ -84,7 +84,7 @@ namespace Cirnix.JassNative.Common
                             case 'V': Cdecl.Invoke<IntPtr>(ptr, param); break;
                             case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, Cdecl.Invoke<int>(ptr, param)); break;
                             case 'R': Natives.SaveReal(ht, ProcCallKey, 0, Cdecl.Invoke<float>(ptr, param)); break;
-                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, Cdecl.Invoke<bool>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, Cdecl.Invoke<int>(ptr, param) > 0); break;
                         }
                         break;
                     case 2:
@@ -93,7 +93,7 @@ namespace Cirnix.JassNative.Common
                             case 'V': StdCall.Invoke<IntPtr>(ptr, param); break;
                             case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, StdCall.Invoke<int>(ptr, param)); break;
                             case 'R': Natives.SaveReal(ht, ProcCallKey, 0, StdCall.Invoke<float>(ptr, param)); break;
-                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, StdCall.Invoke<bool>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, StdCall.Invoke<int>(ptr, param) > 0); break;
                         }
                         break;
                     case 3:
@@ -102,7 +102,7 @@ namespace Cirnix.JassNative.Common
                             case 'V': FastCall.Invoke<IntPtr>(ptr, param); break;
                             case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, FastCall.Invoke<int>(ptr, param)); break;
                             case 'R': Natives.SaveReal(ht, ProcCallKey, 0, FastCall.Invoke<float>(ptr, param)); break;
-                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, FastCall.Invoke<bool>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, FastCall.Invoke<int>(ptr, param) > 0); break;
                         }
                         break;
                     case 4:
@@ -111,7 +111,7 @@ namespace Cirnix.JassNative.Common
                             case 'V': ThisCall.Invoke<IntPtr>(ptr, param); break;
                             case 'I': Natives.SaveInteger(ht, ProcCallKey, 0, ThisCall.Invoke<int>(ptr, param)); break;
                             case 'R': Natives.SaveReal(ht, ProcCallKey, 0, ThisCall.Invoke<float>(ptr, param)); break;
-                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, ThisCall.Invoke<bool>(ptr, param)); break;
+                            case 'B': Natives.SaveBoolean(ht, ProcCallKey, 0, ThisCall.Invoke<int>(ptr, param) > 0); break;
                         }
                         break;
                 }
