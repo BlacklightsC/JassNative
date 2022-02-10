@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -179,24 +180,31 @@ namespace Cirnix.JassNative.Common
             return ret;
         }
 
+
+        private static Dictionary<string, Aes> AesCache = new Dictionary<string, Aes>();
+        private static Aes GetAes(string key)
+        {
+            if (AesCache.ContainsKey(key)) return AesCache[key];
+            Aes aes = Aes.Create();
+            using (Rfc2898DeriveBytes derive = new Rfc2898DeriveBytes(key, Encoding.UTF8.GetBytes(key.PadRight(8, '@'))))
+            {
+                aes.Key = derive.GetBytes(32);
+                aes.IV = derive.GetBytes(16);
+            }
+            AesCache[key] = aes;
+            return aes;
+        }
         private static JassStringRet StringEncrypt(JassStringArg plainText, JassStringArg key)
         {
             try
             {
-                string Key = key;
-                using (Aes aes = Aes.Create())
-                using (Rfc2898DeriveBytes derive = new Rfc2898DeriveBytes(Key, Encoding.UTF8.GetBytes(Key.PadRight(8, '@'))))
+                using (MemoryStream ms = new MemoryStream())
+                using (CryptoStream cs = new CryptoStream(ms, GetAes(key).CreateEncryptor(), CryptoStreamMode.Write))
                 {
-                    aes.Key = derive.GetBytes(32);
-                    aes.IV = derive.GetBytes(16);
-                    using (MemoryStream ms = new MemoryStream())
-                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateEncryptor(), CryptoStreamMode.Write))
-                    {
-                        byte[] buffer = Encoding.UTF8.GetBytes(plainText);
-                        cs.Write(buffer, 0, buffer.Length);
-                        cs.FlushFinalBlock();
-                        return Convert.ToBase64String(ms.ToArray());
-                    }
+                    byte[] buffer = Encoding.UTF8.GetBytes(plainText);
+                    cs.Write(buffer, 0, buffer.Length);
+                    cs.FlushFinalBlock();
+                    return Convert.ToBase64String(ms.ToArray());
                 }
             }
             catch
@@ -208,18 +216,11 @@ namespace Cirnix.JassNative.Common
         {
             try
             {
-                string Key = key;
-                using (Aes aes = Aes.Create())
-                using (Rfc2898DeriveBytes derive = new Rfc2898DeriveBytes(Key, Encoding.UTF8.GetBytes(Key.PadRight(8, '@'))))
+                using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(cipherText)))
+                using (CryptoStream cs = new CryptoStream(ms, GetAes(key).CreateDecryptor(), CryptoStreamMode.Read))
+                using (StreamReader sr = new StreamReader(cs))
                 {
-                    aes.Key = derive.GetBytes(32);
-                    aes.IV = derive.GetBytes(16);
-                    using (MemoryStream ms = new MemoryStream(Convert.FromBase64String(cipherText)))
-                    using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Read))
-                    using (StreamReader sr = new StreamReader(cs))
-                    {
-                        return sr.ReadToEnd();
-                    }
+                    return sr.ReadToEnd();
                 }
             }
             catch
@@ -271,6 +272,12 @@ namespace Cirnix.JassNative.Common
             Natives.Add(new StringSS(StringToBase64));
             Natives.Add(new StringSSS(StringEncrypt));
             Natives.Add(new StringSSS(StringDecrypt));
+        }
+        internal static void OnMapEnd()
+        {
+            foreach (var item in AesCache)
+                item.Value.Dispose();
+            AesCache.Clear();
         }
     }
 }

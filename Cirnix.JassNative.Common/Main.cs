@@ -24,6 +24,7 @@ namespace Cirnix.JassNative.Common
         {
             JassMiscellaneous.OnMapEnd();
             JassStopwatch.OnMapEnd();
+            JassString.OnMapEnd();
         }
 
         public void OnProgramExit() { }
